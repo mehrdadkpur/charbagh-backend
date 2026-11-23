@@ -1,0 +1,6 @@
+@Charbagh.Api_HostAddress = http://localhost:5223
+
+GET {{Charbagh.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
