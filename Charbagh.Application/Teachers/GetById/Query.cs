@@ -3,5 +3,5 @@ using MediatR;
 
 namespace Charbagh.Application.Teachers.GetById
 {
-    public sealed record GetTeacherByIdQuery(Guid Id) : IRequest<TeacherDto>;
+    public sealed record GetTeacherByIdQuery(Guid Id) : IRequest<TeacherDetailsDto>;
 }
