@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Charbagh.Application.Students.GetById
 {
-    public sealed class GetStudentByIdHandler:IRequestHandler<GetStudentByIdQuery , StudentDto>
+    public sealed class GetStudentByIdHandler : IRequestHandler<GetStudentByIdQuery, StudentDetailsDto>
     {
         private readonly IStudentRepository _studentRepository;
 
@@ -15,15 +15,14 @@ namespace Charbagh.Application.Students.GetById
             _studentRepository = studentRepository;
         }
 
-        public async Task<StudentDto> Handle(GetStudentByIdQuery request , CancellationToken cancellationToken)
+        public async Task<StudentDetailsDto> Handle(GetStudentByIdQuery request, CancellationToken cancellationToken)
         {
-            var student = await _studentRepository.GetByIdAsync(request.Id, cancellationToken);
+            var student = await _studentRepository.GetDetailsByIdAsync(request.Id, cancellationToken);
 
-            if(student == null)
-            {
-                throw new TeacherNotFoundException();
-            }
-            return student.ToDto();
+            if (student is null)
+                throw new StudentNotFoundException();
+
+            return student.ToDetailsDto();
         }
     }
 }
