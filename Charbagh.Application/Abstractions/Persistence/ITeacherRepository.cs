@@ -17,8 +17,6 @@ namespace Charbagh.Application.Abstractions.Persistence
 
         Task<Teacher?> GetByIdAsync( Guid teacherId, CancellationToken cancellationToken);
 
-        Task<Teacher?> GetDetailsByIdAsync(Guid teacherId, CancellationToken cancellationToken);
-
         Task<IReadOnlyList<Teacher>> GetAllAsync( CancellationToken cancellationToken);
 
         Task<int> CountAsync( CancellationToken cancellationToken);
