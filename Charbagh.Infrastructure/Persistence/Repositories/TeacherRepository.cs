@@ -7,13 +7,13 @@ namespace Charbagh.Infrastructure.Persistence.Repositories
 {
     public sealed class TeacherRepository : ITeacherRepository
     {
-
         private readonly CharbaghDbContext _context;
 
-        public TeacherRepository (CharbaghDbContext charbaghDbContext)
+        public TeacherRepository(CharbaghDbContext charbaghDbContext)
         {
             _context = charbaghDbContext;
         }
+
         public async Task AddAsync(Teacher teacher, CancellationToken cancellationToken)
         {
             await _context.Teachers.AddAsync(teacher, cancellationToken);
@@ -21,12 +21,12 @@ namespace Charbagh.Infrastructure.Persistence.Repositories
 
         public async Task<bool> ExistsByTeacherCodeAsync(string teacherCode, CancellationToken cancellationToken)
         {
-            return await _context.Teachers.AnyAsync(x => x.PersonnelCode == teacherCode , cancellationToken);
+            return await _context.Teachers.AnyAsync(x => x.PersonnelCode == teacherCode, cancellationToken);
         }
 
         public async Task<bool> ExistsByUserIdAsync(Guid userId, CancellationToken cancellationToken)
         {
-            return await _context.Teachers.AnyAsync(x => x.UserId == userId , cancellationToken);
+            return await _context.Teachers.AnyAsync(x => x.UserId == userId, cancellationToken);
         }
 
         public async Task<bool> ExistsByTeacherCodeExceptAsync(string teacherCode, Guid? exceptTeacherId, CancellationToken cancellationToken)
@@ -43,23 +43,34 @@ namespace Charbagh.Infrastructure.Persistence.Repositories
         {
             return await _context.Teachers
                 .AsNoTracking()
-                .Include(x=>x.User)
+                .Include(x => x.User)
                 .OrderBy(x => x.User.LastName)
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Teacher?> GetByIdAsync( Guid id, CancellationToken cancellationToken)
+        public async Task<Teacher?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return await _context.Teachers
                 .Include(t => t.User)
-                .FirstOrDefaultAsync(
-                    t => t.Id == id,
-                    cancellationToken);
+                .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+        }
+
+        public async Task<Teacher?> GetDetailsByIdAsync(Guid id, CancellationToken cancellationToken)
+        {
+            return await _context.Teachers
+                .AsNoTracking()
+                .Include(t => t.User)
+                    .ThenInclude(u => u.Nationality)
+                .Include(t => t.TeacherInstruments)
+                    .ThenInclude(ti => ti.Instrument)
+                .Include(t => t.TeacherInstruments)
+                    .ThenInclude(ti => ti.DefaultBook)
+                .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
         }
 
         public async Task<int> CountAsync(CancellationToken cancellationToken)
         {
-           return await _context.Teachers.CountAsync(cancellationToken) ;
+            return await _context.Teachers.CountAsync(cancellationToken);
         }
     }
 }
