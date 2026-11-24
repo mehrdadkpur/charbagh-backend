@@ -62,6 +62,10 @@ namespace Charbagh.Application.StudentParents.Create
             if (parent is null)
                 throw new ParentNotFoundException();
 
+            if (student.UserId == parent.UserId)
+                throw new StudentParentValidationException(
+                    "یک شخص نمی‌تواند به‌عنوان والد یا سرپرست خودش ثبت شود.");
+
             var relationshipExists = await _studentParentRepository.ExistsByStudentAndParentAsync(
                 request.StudentId, request.ParentId, cancellationToken);
 
