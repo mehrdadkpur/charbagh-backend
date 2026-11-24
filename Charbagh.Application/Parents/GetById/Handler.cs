@@ -1,4 +1,3 @@
-﻿
 using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Application.Common.Exceptions;
 using Charbagh.Application.Parents.Common;
@@ -6,7 +5,7 @@ using MediatR;
 
 namespace Charbagh.Application.Parents.GetById
 {
-    public sealed class GetParentByIdHandler : IRequestHandler<GetParentByIdQuery , ParentDto>
+    public sealed class GetParentByIdHandler : IRequestHandler<GetParentByIdQuery, ParentDetailsDto>
     {
         private readonly IParentRepository _parentRepository;
 
@@ -15,15 +14,14 @@ namespace Charbagh.Application.Parents.GetById
             _parentRepository = parentRepository;
         }
 
-        public async Task<ParentDto> Handle (GetParentByIdQuery request , CancellationToken cancellationToken)
+        public async Task<ParentDetailsDto> Handle(GetParentByIdQuery request, CancellationToken cancellationToken)
         {
-            var parent = await _parentRepository.GetByIdAsync(request.Id , cancellationToken);
+            var parent = await _parentRepository.GetDetailsByIdAsync(request.Id, cancellationToken);
 
-            if (parent == null)
-            {
+            if (parent is null)
                 throw new ParentNotFoundException();
-            }
-             return parent.ToDto();
+
+            return parent.ToDetailsDto();
         }
     }
 }
