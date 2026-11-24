@@ -1,4 +1,4 @@
-﻿using Charbagh.Domain.Entities.People;
+using Charbagh.Domain.Entities.People;
 
 public class StudentParent : BaseEntity
 {
@@ -16,36 +16,39 @@ public class StudentParent : BaseEntity
     {
     }
 
-    private StudentParent( Guid studentId, Guid parentId, StudentParentRelationship relationship)
+    private StudentParent(Guid studentId, Guid parentId, StudentParentRelationship relationship)
     {
         StudentId = studentId;
         ParentId = parentId;
         Relationship = relationship;
     }
 
-    public static StudentParent Create( Guid studentId, Guid parentId, StudentParentRelationship relationship)
+    public static StudentParent Create(Guid studentId, Guid parentId, StudentParentRelationship relationship)
     {
         if (studentId == Guid.Empty)
-            throw new ArgumentException("Student is required.");
+            throw new ArgumentException("Student is required.", nameof(studentId));
 
         if (parentId == Guid.Empty)
-            throw new ArgumentException("Parent is required.");
+            throw new ArgumentException("Parent is required.", nameof(parentId));
 
         if (studentId == parentId)
-            throw new InvalidOperationException(
-                "Student and parent cannot be the same person.");
+            throw new InvalidOperationException("Student and parent cannot be the same person.");
 
-        var studentParent = new StudentParent( studentId,parentId, relationship);
+        if (!Enum.IsDefined(typeof(StudentParentRelationship), relationship))
+            throw new ArgumentOutOfRangeException(nameof(relationship), "Student-parent relationship is not valid.");
 
+        var studentParent = new StudentParent(studentId, parentId, relationship);
         studentParent.MarkAsCreated();
 
         return studentParent;
     }
 
-    public void UpdateRelationship( StudentParentRelationship relationship)
+    public void UpdateRelationship(StudentParentRelationship relationship)
     {
-        Relationship = relationship;
+        if (!Enum.IsDefined(typeof(StudentParentRelationship), relationship))
+            throw new ArgumentOutOfRangeException(nameof(relationship), "Student-parent relationship is not valid.");
 
+        Relationship = relationship;
         MarkAsUpdated();
     }
 }
