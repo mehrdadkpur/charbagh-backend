@@ -1,4 +1,4 @@
-﻿using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Domain.Entities.People;
 using Charbagh.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -8,34 +8,46 @@ namespace Charbagh.Infrastructure.Persistence.Repositories
     public class ParentRepository : IParentRepository
     {
         private readonly CharbaghDbContext _dbContext;
-        
+
         public ParentRepository(CharbaghDbContext dbContext)
         {
             _dbContext = dbContext;
         }
+
         public async Task AddAsync(Parent parent, CancellationToken cancellationToken)
         {
-           await _dbContext.Parents.AddAsync(parent, cancellationToken);
+            await _dbContext.Parents.AddAsync(parent, cancellationToken);
         }
 
         public async Task<IReadOnlyList<Parent>> GetAllAsync(CancellationToken cancellationToken)
         {
             return await _dbContext.Parents
                 .AsNoTracking()
-                .Include(x=> x.User)
+                .Include(x => x.User)
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Parent?> GetByIdAsync(Guid ParentId, CancellationToken cancellationToken)
+        public async Task<Parent?> GetByIdAsync(Guid parentId, CancellationToken cancellationToken)
         {
             return await _dbContext.Parents
-                .Include(x=> x.User)
-                .FirstOrDefaultAsync(x => x.Id == ParentId , cancellationToken);
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == parentId, cancellationToken);
         }
 
-        public async Task<bool> ExistsByUserIdAsync(Guid UserId, CancellationToken cancellationToken)
+        public async Task<Parent?> GetDetailsByIdAsync(Guid parentId, CancellationToken cancellationToken)
         {
-            return await _dbContext.Parents.AnyAsync(x => x.UserId == UserId , cancellationToken);
+            return await _dbContext.Parents
+                .AsNoTracking()
+                .Include(x => x.User)
+                .Include(x => x.StudentParents)
+                    .ThenInclude(x => x.Student)
+                        .ThenInclude(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == parentId, cancellationToken);
+        }
+
+        public async Task<bool> ExistsByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.Parents.AnyAsync(x => x.UserId == userId, cancellationToken);
         }
     }
 }
