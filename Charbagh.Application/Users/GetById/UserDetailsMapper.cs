@@ -9,6 +9,9 @@ public static class UserDetailsMapper
     {
         return new UserDetailsDto(
             user.ToDto(),
+            user.MobileConfirmed,
+            user.EmailConfirmed,
+            user.LastLoginAt,
             user.Student is null ? null : new UserProfileDetailsDto(
                 user.Student.Id, user.Student.StudentCode, (int)user.Student.Status),
             user.Teacher is null ? null : new UserProfileDetailsDto(
