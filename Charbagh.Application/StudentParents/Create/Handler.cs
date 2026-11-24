@@ -47,6 +47,9 @@ namespace Charbagh.Application.StudentParents.Create
                     "برای اتصال والد، ابتدا باید تاریخ تولد هنرآموز ثبت شود.");
 
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            if (birthDate.Value > today)
+                throw new StudentParentValidationException("تاریخ تولد هنرآموز نمی‌تواند در آینده باشد.");
+
             var age = today.Year - birthDate.Value.Year;
             if (birthDate.Value > today.AddYears(-age))
                 age--;
