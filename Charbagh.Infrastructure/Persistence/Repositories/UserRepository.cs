@@ -1,4 +1,4 @@
-﻿using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Domain.Entities.Identity;
 using Charbagh.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -12,21 +12,37 @@ public sealed class UserRepository : IUserRepository
         _context = context;
     }
 
-    public async Task AddAsync( User user, CancellationToken cancellationToken)
+    public async Task AddAsync(User user, CancellationToken cancellationToken)
     {
-        await _context.Users.AddAsync( user, cancellationToken);
+        await _context.Users.AddAsync(user, cancellationToken);
     }
 
-    public Task<User?> GetByIdAsync(Guid id,CancellationToken cancellationToken)
+    public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return _context.Users
             .Include(user => user.Nationality)
-            .FirstOrDefaultAsync(
-                x => x.Id == id,
-                cancellationToken);
+            .FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
     }
 
-    public async Task<List<User>> GetAllAsync( CancellationToken cancellationToken)
+    public Task<User?> GetDetailsByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return _context.Users
+            .AsNoTracking()
+            .AsSplitQuery()
+            .Include(user => user.Nationality)
+            .Include(user => user.Student)
+            .Include(user => user.Teacher)
+            .Include(user => user.Parent)
+            .Include(user => user.Staff)
+            .Include(user => user.UserBranches)
+                .ThenInclude(userBranch => userBranch.Branch)
+            .Include(user => user.UserBranches)
+                .ThenInclude(userBranch => userBranch.UserBranchRoles)
+                    .ThenInclude(userBranchRole => userBranchRole.Role)
+            .FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
+    }
+
+    public async Task<List<User>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await _context.Users
             .AsNoTracking()
@@ -35,34 +51,39 @@ public sealed class UserRepository : IUserRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<User?> GetByNationalIdentificationNumberAsync( string nationalIdentificationNumber, CancellationToken cancellationToken)
+    public async Task<User?> GetByNationalIdentificationNumberAsync(string nationalIdentificationNumber, CancellationToken cancellationToken)
     {
-        return await _context.Users.FirstOrDefaultAsync(x => x.NationalIdentificationNumber == nationalIdentificationNumber , cancellationToken);
+        return await _context.Users.FirstOrDefaultAsync(
+            user => user.NationalIdentificationNumber == nationalIdentificationNumber,
+            cancellationToken);
     }
 
-    public async Task<User?> GetByMobileAsync( string mobile,CancellationToken cancellationToken)
+    public async Task<User?> GetByMobileAsync(string mobile, CancellationToken cancellationToken)
     {
-        return await _context.Users.AsNoTracking().FirstOrDefaultAsync( x => x.Mobile == mobile, cancellationToken);
+        return await _context.Users.AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Mobile == mobile, cancellationToken);
     }
 
     public async Task<bool> ExistsNationalIdentificationNumberAsync(string nationalIdentificationNumber, Guid? excludeUserId, CancellationToken cancellationToken)
     {
-        return await _context.Users.AnyAsync(x => x.NationalIdentificationNumber == nationalIdentificationNumber && x.Id != excludeUserId , cancellationToken);
+        return await _context.Users.AnyAsync(
+            user => user.NationalIdentificationNumber == nationalIdentificationNumber && user.Id != excludeUserId,
+            cancellationToken);
     }
 
     public async Task<bool> ExistsByUserIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _context.Users.AnyAsync(x => x.Id == id, cancellationToken);
+        return await _context.Users.AnyAsync(user => user.Id == id, cancellationToken);
     }
 
     public async Task<bool> ExistsNationalityIdAsync(Guid nationalityId, CancellationToken cancellationToken)
     {
-        return await _context.Users.AnyAsync(x => x.NationalityId == nationalityId, cancellationToken);
+        return await _context.Users.AnyAsync(user => user.NationalityId == nationalityId, cancellationToken);
     }
 
-    public Task<bool> ExistsByMobileAsync( string mobile, CancellationToken cancellationToken)
+    public Task<bool> ExistsByMobileAsync(string mobile, CancellationToken cancellationToken)
     {
-        return _context.Users.AnyAsync( x => x.Mobile == mobile, cancellationToken);
+        return _context.Users.AnyAsync(user => user.Mobile == mobile, cancellationToken);
     }
 
     public async Task<int> CountAsync(CancellationToken cancellationToken)
