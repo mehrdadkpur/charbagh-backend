@@ -4,6 +4,9 @@ namespace Charbagh.Application.Users.GetById;
 
 public sealed record UserDetailsDto(
     UserDto User,
+    bool MobileConfirmed,
+    bool EmailConfirmed,
+    DateTime? LastLoginAt,
     UserProfileDetailsDto? Student,
     UserProfileDetailsDto? Teacher,
     UserProfileDetailsDto? Parent,
