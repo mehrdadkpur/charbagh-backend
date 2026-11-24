@@ -15,6 +15,7 @@ namespace Charbagh.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PermissionsController : ControllerBase
 {
     private readonly ISender _sender;
@@ -37,6 +38,7 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [HasPermission("Permissions", PermissionAction.View)]
     public async Task<IActionResult> GetById( Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetPermissionByIdQuery(id),cancellationToken);
@@ -52,6 +54,7 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [HasPermission("Permissions", PermissionAction.Update)]
     public async Task<IActionResult> Update( Guid id, UpdatePermissionCommand command, CancellationToken cancellationToken)
     {
         if (id != command.Id)
@@ -63,6 +66,7 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpGet("system/{isSystem}")]
+    [HasPermission("Permissions", PermissionAction.View)]
     public async Task<IActionResult> GetByIsSystem(bool isSystem, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetPermissionsByIsSystemQuery(isSystem), cancellationToken);
@@ -70,6 +74,7 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpGet("name/{name}")]
+    [HasPermission("Permissions", PermissionAction.View)]
     public async Task<IActionResult> GetByName(string name, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetPermissionsByNameQuery(name), cancellationToken);
@@ -77,6 +82,7 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpGet("module/{module}")]
+    [HasPermission("Permissions", PermissionAction.View)]
     public async Task<IActionResult> GetByModule(string module, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetPermissionsByModuleQuery(module), cancellationToken);
