@@ -1,7 +1,6 @@
 using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Application.Transactions.Common;
 using Charbagh.Domain.Entities.Finance;
-using Charbagh.Domain.Enums;
 using MediatR;
 
 namespace Charbagh.Application.Transactions.MarkAsSuccessful;
