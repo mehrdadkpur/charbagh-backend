@@ -30,7 +30,9 @@ namespace Charbagh.Infrastructure.Persistence.Repositories
 
         public async Task<Blog?> GetByIdAsync(Guid Id, CancellationToken cancellationToken)
         {
-            return await _context.Blogs.FirstOrDefaultAsync(x => x.Id == Id , cancellationToken);
+            return await _context.Blogs
+                .Include(x => x.Author)
+                .FirstOrDefaultAsync(x => x.Id == Id, cancellationToken);
         }
 
         public async Task<IReadOnlyList< Blog>> GetByUserIdAsync(Guid UserId, CancellationToken cancellationToken)
