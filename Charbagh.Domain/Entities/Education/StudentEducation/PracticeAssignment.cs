@@ -62,6 +62,9 @@ namespace Charbagh.Domain.Entities.Education.StudentEducation
             if (bookItemId == Guid.Empty)
                 throw new ArgumentException("Book Item is required.", nameof(bookItemId));
 
+            if (!Enum.IsDefined(typeof(PracticePriority), priority))
+                throw new ArgumentOutOfRangeException(nameof(priority), "Practice priority is invalid.");
+
             var practiceAssignment = new PracticeAssignment(
                 lessonSessionId,
                 bookItemId, 
