@@ -10,5 +10,6 @@
         int? Volume,
         BookLevel Level,
         string? CoverImageUrl,
-        int DisplayOrder);
+        int DisplayOrder,
+        bool IsActive);
 }
