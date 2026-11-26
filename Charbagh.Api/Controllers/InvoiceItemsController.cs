@@ -2,6 +2,8 @@
 using Charbagh.Application.InvoiceItems.GetAll;
 using Charbagh.Application.InvoiceItems.GetById;
 using Charbagh.Application.InvoiceItems.Update;
+using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Application.InvoiceItems.Common;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +14,19 @@ namespace Charbagh.Api.Controllers;
 public sealed class InvoiceItemsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IInvoiceItemRepository _repository;
 
-    public InvoiceItemsController(IMediator mediator)
+    public InvoiceItemsController(IMediator mediator, IInvoiceItemRepository repository)
     {
         _mediator = mediator;
+        _repository = repository;
+    }
+
+    [HttpGet("invoice/{invoiceId:guid}")]
+    public async Task<IActionResult> GetByInvoice(Guid invoiceId, CancellationToken cancellationToken)
+    {
+        var items = await _repository.GetByInvoiceIdAsync(invoiceId, cancellationToken);
+        return Ok(items.Select(item => item.ToDto()).ToList());
     }
 
     [HttpPost]
