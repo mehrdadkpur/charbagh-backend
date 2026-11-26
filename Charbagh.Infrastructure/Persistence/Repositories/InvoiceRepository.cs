@@ -22,18 +22,20 @@ namespace Charbagh.Infrastructure.Persistence.Repositories
 
         public async Task<IReadOnlyList<Invoice>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await _charbaghDbContext.Invoices.AsNoTracking().OrderByDescending(x => x.InvoiceDate).ToListAsync(cancellationToken);
+            return await _charbaghDbContext.Invoices.AsNoTracking().Include(x => x.Items).Include(x => x.Discount).OrderByDescending(x => x.InvoiceDate).ToListAsync(cancellationToken);
         }
 
         public async Task<Invoice?> GetByIdAsync(Guid Id, CancellationToken cancellationToken)
         {
-            return await _charbaghDbContext.Invoices.FirstOrDefaultAsync(x => x.Id == Id , cancellationToken);
+            return await _charbaghDbContext.Invoices.Include(x => x.Items).Include(x => x.Discount).FirstOrDefaultAsync(x => x.Id == Id , cancellationToken);
         }
 
         public async Task<IReadOnlyList<Invoice>> GetByStudentIdAsync(Guid StudentId, CancellationToken cancellationToken)
         {
             return await _charbaghDbContext.Invoices
                 .AsNoTracking()
+                .Include(x => x.Items)
+                .Include(x => x.Discount)
                 .Where(x => x.StudentId == StudentId)
                 .OrderByDescending(x => x.InvoiceDate)
                 .ToListAsync(cancellationToken);
