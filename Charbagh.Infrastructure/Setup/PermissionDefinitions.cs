@@ -240,6 +240,10 @@ internal static class PermissionDefinitions
         new("Tags", "tags.create", PermissionAction.Create, "ایجاد برچسب"),
         new("Tags", "tags.update", PermissionAction.Update, "ویرایش برچسب‌ها"),
         new("Tags", "tags.delete", PermissionAction.Delete, "حذف برچسب‌ها"),
+        
+        // CMS - Contact requests
+        new("Contacts", "contacts.view", PermissionAction.View, "مشاهده درخواست‌های پشتیبانی"),
+        new("Contacts", "contacts.manage", PermissionAction.Manage, "مدیریت درخواست‌های پشتیبانی"),
 
         // CMS - Galleries
         new("Galleries", "galleries.view", PermissionAction.View, "مشاهده گالری‌ها"),
