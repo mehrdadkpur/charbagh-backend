@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Charbagh.Application.LessonContents.Common;
+using MediatR;
 
-namespace Charbagh.Application.LessonContents.GetByLessonSession
-{
-    internal class Query
-    {
-    }
-}
+namespace Charbagh.Application.LessonContents.GetByLessonSession;
+
+public sealed record GetLessonContentsBySessionQuery(Guid LessonSessionId)
+    : IRequest<IReadOnlyList<LessonContentDto>>;
