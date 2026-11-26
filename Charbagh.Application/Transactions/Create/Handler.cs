@@ -88,6 +88,24 @@ public sealed class CreateTransactionHandler
 
         if (request.Type == TransactionType.Refund)
         {
+            var hasReceiptHistory = relatedTransactions.Any(
+                x => x.Type == TransactionType.PaymentReceived);
+
+            if (hasReceiptHistory &&
+                !relatedTransactions.Any(x =>
+                    x.Type == TransactionType.PaymentReceived &&
+                    x.Status == TransactionStatus.Successful))
+            {
+                throw new InvalidOperationException(
+                    "A payment cannot be refunded before its receipt transaction succeeds.");
+            }
+
+            if (request.Amount > payment.Invoice.PaidAmount)
+            {
+                throw new InvalidOperationException(
+                    "Refund amount exceeds the invoice paid amount.");
+            }
+
             var alreadyReserved = relatedTransactions
                 .Where(x => x.Type == TransactionType.Refund &&
                             (x.Status == TransactionStatus.Pending ||
