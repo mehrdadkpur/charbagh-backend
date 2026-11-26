@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Charbagh.Application.InstrumentCategories.Update
 {
-    public sealed record UpdateInstrumentCategoryCommand(Guid Id , string Name , string Description ) : IRequest<InstrumentCategoryDto>;
+    public sealed record UpdateInstrumentCategoryCommand(Guid Id , string Name , string? Description ) : IRequest<InstrumentCategoryDto>;
 }
