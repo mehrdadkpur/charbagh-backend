@@ -27,7 +27,7 @@ public sealed class AttendancesController : ControllerBase
     {
         var result = await _mediator.Send(command, cancellationToken);
 
-        return CreatedAtAction( nameof(Application.Attendances.GetById), new { id = result.Id }, result);
+        return CreatedAtAction( nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
