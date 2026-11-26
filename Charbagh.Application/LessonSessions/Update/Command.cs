@@ -10,7 +10,7 @@ namespace Charbagh.Application.LessonSessions.Update
         TimeSpan? StartTime,
         TimeSpan? EndTime,
         int? DurationMinutes,
-        string TeacherNote
+        string? TeacherNote
         ): IRequest<LessonSessionDto>;
     
 }
