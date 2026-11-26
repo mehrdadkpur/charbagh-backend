@@ -43,6 +43,17 @@ public sealed class GalleriesController : ControllerBase
         return Ok(result.Where(gallery => gallery.Status == GalleryStatus.Published));
     }
 
+    [HttpGet("published/{id:guid}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPublishedById(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new GetGalleryByIdQuery(id), cancellationToken);
+        if (result.Status != GalleryStatus.Published)
+            return NotFound();
+
+        return Ok(result);
+    }
+
     [HttpGet("{id:guid}")]
     [HasPermission("Galleries", PermissionAction.View)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
