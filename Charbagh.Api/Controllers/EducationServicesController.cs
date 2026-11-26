@@ -1,11 +1,4 @@
 ﻿using Charbagh.Application.Attendances.Create;
-using Charbagh.Application.Attendances.GetAll;
-using Charbagh.Application.Attendances.GetById;
-using Charbagh.Application.Attendances.SetAbsent;
-using Charbagh.Application.Attendances.SetExcuse;
-using Charbagh.Application.Attendances.SetLate;
-using Charbagh.Application.Attendances.SetPresent;
-using Charbagh.Application.Attendances.Update;
 using Charbagh.Application.EducationServices.Activate;
 using Charbagh.Application.EducationServices.Create;
 using Charbagh.Application.EducationServices.Deactivate;
@@ -33,7 +26,7 @@ public sealed class EducationServicesController : ControllerBase
     {
         var result = await _mediator.Send(command, cancellationToken);
 
-        return CreatedAtAction( nameof(Application.EducationServices.GetById), new { id = result.Id }, result);
+        return CreatedAtAction( nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
