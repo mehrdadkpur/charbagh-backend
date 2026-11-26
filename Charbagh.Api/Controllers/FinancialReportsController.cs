@@ -231,8 +231,11 @@ public sealed class FinancialReportsController : ControllerBase
             invoiceCount = validInvoices.Count,
             invoicedAmount = validInvoices.Sum(x => x.TotalAmount),
             discountAmount = validInvoices.Sum(x => x.DiscountAmount),
-            collectedAmount = paymentPeriod.Sum(x => x.Amount),
+            collectedAmount = paymentPeriod.Sum(x => x.Amount) -
+                              refundPeriod.Sum(x => x.Amount),
             paymentCount = paymentPeriod.Count,
+            refundAmount = refundPeriod.Sum(x => x.Amount),
+            refundCount = refundPeriod.Count,
             outstandingAmount = outstandingInvoices.Sum(x => x.remainingAmount),
             outstandingInvoiceCount = outstandingInvoices.Count,
             dailyPayments,
