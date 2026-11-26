@@ -52,19 +52,9 @@ public sealed class FinancialReportsController : ControllerBase
                         x.Status != InvoiceStatus.Cancelled)
             .ToList();
 
-        var paymentRecordsInPeriod = allPayments
-            .Where(x => x.PaymentDate >= start && x.PaymentDate < endExclusive)
-            .OrderBy(x => x.PaymentDate)
-            .ToList();
-
         var paymentReceiptTransactions = transactions
             .Where(x => x.Type == TransactionType.PaymentReceived)
             .ToList();
-
-        var successfulReceiptPaymentIds = paymentReceiptTransactions
-            .Where(x => x.Status == TransactionStatus.Successful)
-            .Select(x => x.PaymentId)
-            .ToHashSet();
 
         var paymentIdsWithReceiptTransactions = paymentReceiptTransactions
             .Select(x => x.PaymentId)
@@ -108,12 +98,36 @@ public sealed class FinancialReportsController : ControllerBase
             }
         }
 
-        var confirmedPaymentIds = successfulReceiptPaymentIds
-            .Concat(legacyConfirmedPaymentIds)
-            .ToHashSet();
-
-        var paymentPeriod = paymentRecordsInPeriod
-            .Where(x => confirmedPaymentIds.Contains(x.Id))
+        var paymentPeriod = transactions
+            .Where(x => x.Type == TransactionType.PaymentReceived &&
+                        x.Status == TransactionStatus.Successful &&
+                        x.TransactionDate >= start &&
+                        x.TransactionDate < endExclusive)
+            .Select(x => new
+            {
+                Id = x.Id,
+                InvoiceId = x.Payment.InvoiceId,
+                PaymentDate = x.TransactionDate,
+                Amount = x.Amount,
+                PaymentMethodId = x.Payment.PaymentMethodId,
+                ReferenceNumber = x.ReferenceNumber ?? x.Payment.ReferenceNumber,
+                Note = x.Description ?? x.Payment.Note
+            })
+            .Concat(allPayments
+                .Where(x => legacyConfirmedPaymentIds.Contains(x.Id) &&
+                            x.PaymentDate >= start &&
+                            x.PaymentDate < endExclusive)
+                .Select(x => new
+                {
+                    Id = x.Id,
+                    InvoiceId = x.InvoiceId,
+                    PaymentDate = x.PaymentDate,
+                    Amount = x.Amount,
+                    PaymentMethodId = x.PaymentMethodId,
+                    ReferenceNumber = x.ReferenceNumber,
+                    Note = x.Note
+                }))
+            .OrderBy(x => x.PaymentDate)
             .ToList();
 
         var refundPeriod = transactions
