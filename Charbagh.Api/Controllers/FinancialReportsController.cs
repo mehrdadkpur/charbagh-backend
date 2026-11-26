@@ -68,6 +68,17 @@ public sealed class FinancialReportsController : ControllerBase
             })
             .ToList();
 
+        var monthlyPayments = paymentPeriod
+            .GroupBy(x => new DateTime(x.PaymentDate.Year, x.PaymentDate.Month, 1))
+            .OrderBy(x => x.Key)
+            .Select(group => new
+            {
+                month = group.Key,
+                amount = group.Sum(x => x.Amount),
+                count = group.Count()
+            })
+            .ToList();
+
         var serviceRevenue = validInvoices
             .SelectMany(invoice => invoice.Items)
             .GroupBy(item => item.Description)
@@ -124,6 +135,7 @@ public sealed class FinancialReportsController : ControllerBase
             outstandingAmount = outstandingInvoices.Sum(x => x.remainingAmount),
             outstandingInvoiceCount = outstandingInvoices.Count,
             dailyPayments,
+            monthlyPayments,
             serviceRevenue,
             studentBalances,
             outstandingInvoices,
