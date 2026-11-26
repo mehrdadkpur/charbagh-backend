@@ -33,6 +33,28 @@ public sealed class MarkTransactionSuccessfulHandler
         if (transaction.Status == TransactionStatus.Successful)
             return transaction.ToDto();
 
+        if (transaction.Type == TransactionType.PaymentReceived)
+        {
+            var relatedTransactions =
+                await _transactionRepository.GetByPaymentIdAsync(
+                    transaction.PaymentId,
+                    cancellationToken);
+
+            var anotherActiveReceipt = relatedTransactions.Any(x =>
+                x.Id != transaction.Id &&
+                x.Type == TransactionType.PaymentReceived &&
+                (x.Status == TransactionStatus.Pending ||
+                 x.Status == TransactionStatus.Successful));
+
+            if (anotherActiveReceipt)
+            {
+                throw new InvalidOperationException(
+                    "Another pending or successful receipt transaction already exists for this payment.");
+            }
+
+            transaction.Payment.Invoice.AddPayment(transaction.Amount);
+        }
+
         if (transaction.Type == TransactionType.Refund)
         {
             var payment = transaction.Payment;
