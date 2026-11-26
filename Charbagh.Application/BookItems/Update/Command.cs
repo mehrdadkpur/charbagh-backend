@@ -6,7 +6,6 @@ namespace Charbagh.Application.BookItems.Update
 {
     public sealed record UpdateBookItemCommand(
         Guid Id, 
-        Guid BookId ,
         string Title,
         string? Description,
         int DisplayOrder,
