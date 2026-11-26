@@ -25,7 +25,7 @@ namespace Charbagh.Application.GalleryItems.Update
                 throw new GalleryItemNotFoundException(reqest.Id);
             }
 
-            galleryItem.Update(reqest.Title , reqest.Description , reqest.ThumbnailUrl);
+            galleryItem.Update(reqest.Title, reqest.Description, reqest.ThumbnailUrl, reqest.FileUrl);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
