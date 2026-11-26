@@ -62,6 +62,11 @@ namespace Charbagh.Domain.Entities.Education.StudentEducation
             if (lessonSessionId == Guid.Empty)
                 throw new ArgumentException("Lesson session is required.", nameof(lessonSessionId));
 
+            if (!Enum.IsDefined(typeof(AttendanceStatus), status))
+                throw new ArgumentOutOfRangeException(nameof(status), "Attendance status is invalid.");
+
+            ValidateTimes(checkInAt, checkOutAt);
+
             var attendance = new Attendance(
                 lessonSessionId,
                 status,
