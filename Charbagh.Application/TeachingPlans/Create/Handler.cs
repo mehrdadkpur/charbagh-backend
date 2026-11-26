@@ -70,7 +70,8 @@ namespace Charbagh.Application.TeachingPlans.Create
                 request.StartDate,
                 request.DisplayOrder,
                 request.Objective,
-                request.Notes);
+                request.Notes,
+                request.EndDate);
 
             await _teachingPlanRepository.AddAsync(teachingPlan , cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
