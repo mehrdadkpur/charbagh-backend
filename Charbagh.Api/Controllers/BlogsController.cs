@@ -6,6 +6,8 @@ using Charbagh.Application.Blogs.SetPublish;
 using Charbagh.Application.Blogs.SetRestore;
 using Charbagh.Application.Blogs.SetUnpublish;
 using Charbagh.Application.Blogs.Update;
+using Charbagh.Api.Authorization;
+using Charbagh.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +25,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission("Blogs", PermissionAction.Create)]
     public async Task<IActionResult> Create( CreateBlogCommand command,CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
@@ -34,6 +37,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [HasPermission("Blogs", PermissionAction.View)]
     public async Task<IActionResult> GetById( Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetBlogByIdQuery(id),cancellationToken);
@@ -41,6 +45,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission("Blogs", PermissionAction.View)]
     public async Task<IActionResult> GetAll( CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetAllBlogsQuery(), cancellationToken);
@@ -48,6 +53,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [HasPermission("Blogs", PermissionAction.Update)]
     public async Task<IActionResult> Update( Guid id, UpdateBlogCommand command, CancellationToken cancellationToken)
     {
         if (id != command.Id)
@@ -59,6 +65,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/archive")]
+    [HasPermission("Blogs", PermissionAction.Delete)]
     public async Task<IActionResult> SetArchive( Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send( new SetArchiveBlogCommand(id), cancellationToken);
@@ -67,6 +74,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/publish")]
+    [HasPermission("Blogs", PermissionAction.Approve)]
     public async Task<IActionResult> SetPublish( Guid id,CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new SetPublishBlogCommand(id), cancellationToken);
@@ -75,6 +83,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/restore")]
+    [HasPermission("Blogs", PermissionAction.Update)]
     public async Task<IActionResult> SetRestore(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new SetRestoreBlogCommand(id), cancellationToken);
@@ -83,6 +92,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/unpublish")]
+    [HasPermission("Blogs", PermissionAction.Approve)]
     public async Task<IActionResult> SetUnpublish(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new SetUnpublishBlogCommand(id), cancellationToken);
