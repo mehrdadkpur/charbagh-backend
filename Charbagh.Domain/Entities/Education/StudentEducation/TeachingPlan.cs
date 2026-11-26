@@ -81,8 +81,12 @@ public sealed class TeachingPlan : BaseEntity
         DateOnly startDate,
         int displayOrder,
         string? objective,
-        string? notes)
+        string? notes,
+        DateOnly? endDate = null)
     {
+        if (endDate.HasValue && endDate.Value < startDate)
+            throw new ArgumentException("End date cannot be earlier than start date.", nameof(endDate));
+
         if (lessonAssignmentId == Guid.Empty)
             throw new ArgumentException(
                 "Lesson assignment is required.",
@@ -113,6 +117,7 @@ public sealed class TeachingPlan : BaseEntity
             objective,
             notes);
 
+        teachingPlan.EndDate = endDate;
         teachingPlan.MarkAsCreated();
 
         return teachingPlan;
