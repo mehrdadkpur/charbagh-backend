@@ -1,12 +1,4 @@
-﻿using Charbagh.Application.Attendances.Create;
-using Charbagh.Application.Attendances.GetAll;
-using Charbagh.Application.Attendances.GetById;
-using Charbagh.Application.Attendances.SetAbsent;
-using Charbagh.Application.Attendances.SetExcuse;
-using Charbagh.Application.Attendances.SetLate;
-using Charbagh.Application.Attendances.SetPresent;
-using Charbagh.Application.Attendances.Update;
-using Charbagh.Application.ServicePrices.Create;
+﻿using Charbagh.Application.ServicePrices.Create;
 using Charbagh.Application.ServicePrices.GetAll;
 using Charbagh.Application.ServicePrices.GetById;
 using Charbagh.Application.ServicePrices.SetEffectiveTo;
