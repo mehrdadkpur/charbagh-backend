@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Charbagh.Application.Attendances.Create;
 using Charbagh.Application.Attendances.GetAll;
-using Charbagh.Application.Attendances.GetById;
+using Charbagh.Application.Attendances.GetById;\nusing Charbagh.Application.Attendances.GetByLessonSession;
 using Charbagh.Application.Attendances.SetPresent;
 using Charbagh.Application.Attendances.SetAbsent;
 using Charbagh.Application.Attendances.SetLate;
@@ -36,6 +36,13 @@ public sealed class AttendancesController : ControllerBase
         var result =await _mediator.Send(new GetAllAttendancesQuery(), cancellationToken);
 
         return Ok(result);
+    }
+
+    [HttpGet("session/{lessonSessionId:guid}")]
+    public async Task<IActionResult> GetByLessonSession(Guid lessonSessionId, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetAttendanceByLessonSessionQuery(lessonSessionId), cancellationToken);
+        return result is null ? NotFound() : Ok(result);
     }
 
     [HttpGet("{id:guid}")]
