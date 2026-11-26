@@ -50,6 +50,33 @@ public sealed class CreateTransactionHandler
                 "Transaction amount must be greater than zero.",
                 nameof(request.Amount));
 
+        if (!Enum.IsDefined(typeof(TransactionType), request.Type))
+            throw new ArgumentException(
+                "Transaction type is invalid.",
+                nameof(request.Type));
+
+        if (request.Type == TransactionType.Refund)
+        {
+            var relatedTransactions =
+                await _transactionRepository.GetByPaymentIdAsync(
+                    payment.Id,
+                    cancellationToken);
+
+            var alreadyReserved = relatedTransactions
+                .Where(x => x.Type == TransactionType.Refund &&
+                            (x.Status == TransactionStatus.Pending ||
+                             x.Status == TransactionStatus.Successful))
+                .Sum(x => x.Amount);
+
+            var refundableAmount = payment.Amount - alreadyReserved;
+
+            if (request.Amount > refundableAmount)
+            {
+                throw new InvalidOperationException(
+                    "Refund amount exceeds the remaining refundable payment amount.");
+            }
+        }
+
         var transaction = Transaction.Create(
             request.PaymentId,
             request.CreatedByUserId,
