@@ -61,20 +61,59 @@ public sealed class FinancialReportsController : ControllerBase
             .Where(x => x.Type == TransactionType.PaymentReceived)
             .ToList();
 
-        var paymentIdsWithReceiptTransactions = paymentReceiptTransactions
-            .Select(x => x.PaymentId)
-            .ToHashSet();
-
         var successfulReceiptPaymentIds = paymentReceiptTransactions
             .Where(x => x.Status == TransactionStatus.Successful)
             .Select(x => x.PaymentId)
             .ToHashSet();
 
-        // Legacy payments without receipt transactions remain recognized as received.
-        // New payments are counted only after their receipt transaction succeeds.
+        var paymentIdsWithReceiptTransactions = paymentReceiptTransactions
+            .Select(x => x.PaymentId)
+            .ToHashSet();
+
+        var successfulReceiptAmountsByInvoice = paymentReceiptTransactions
+            .Where(x => x.Status == TransactionStatus.Successful)
+            .GroupBy(x => x.Payment.InvoiceId)
+            .ToDictionary(group => group.Key, group => group.Sum(x => x.Amount));
+
+        var successfulRefundAmountsByInvoice = transactions
+            .Where(x => x.Type == TransactionType.Refund &&
+                        x.Status == TransactionStatus.Successful)
+            .GroupBy(x => x.Payment.InvoiceId)
+            .ToDictionary(group => group.Key, group => group.Sum(x => x.Amount));
+
+        // Payments created before receipt transactions existed are recognized as legacy
+        // receipts only up to the amount actually reflected in the invoice balance.
+        var legacyConfirmedPaymentIds = new HashSet<Guid>();
+        foreach (var invoice in allInvoices)
+        {
+            var legacyCapacity = invoice.PaidAmount;
+            if (successfulRefundAmountsByInvoice.TryGetValue(invoice.Id, out var refunded))
+                legacyCapacity += refunded;
+            if (successfulReceiptAmountsByInvoice.TryGetValue(invoice.Id, out var received))
+                legacyCapacity -= received;
+
+            var legacyPayments = allPayments
+                .Where(x => x.InvoiceId == invoice.Id &&
+                            !paymentIdsWithReceiptTransactions.Contains(x.Id))
+                .OrderBy(x => x.PaymentDate)
+                .ToList();
+
+            foreach (var legacyPayment in legacyPayments)
+            {
+                if (legacyCapacity < legacyPayment.Amount)
+                    break;
+
+                legacyConfirmedPaymentIds.Add(legacyPayment.Id);
+                legacyCapacity -= legacyPayment.Amount;
+            }
+        }
+
+        var confirmedPaymentIds = successfulReceiptPaymentIds
+            .Concat(legacyConfirmedPaymentIds)
+            .ToHashSet();
+
         var paymentPeriod = paymentRecordsInPeriod
-            .Where(x => successfulReceiptPaymentIds.Contains(x.Id) ||
-                        !paymentIdsWithReceiptTransactions.Contains(x.Id))
+            .Where(x => confirmedPaymentIds.Contains(x.Id))
             .ToList();
 
         var refundPeriod = transactions
