@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Charbagh.Application.Instruments.GetAll;
 
-public sealed record GetAllUserssQuery : IRequest<IReadOnlyList<InstrumentDto>>;
+public sealed record GetAllInstrumentsQuery : IRequest<IReadOnlyList<InstrumentDto>>;
