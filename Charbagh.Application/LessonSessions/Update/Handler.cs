@@ -9,13 +9,11 @@ namespace Charbagh.Application.LessonSessions.Update
     public sealed class UpdateLessonSessionsHandler: IRequestHandler<UpdateLessonSessionCommand , LessonSessionDto>
     {
         private readonly ILessonSessionRepository _sessionRepository;
-        private readonly ILessonAssignmentRepository _assignmentRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateLessonSessionsHandler(ILessonSessionRepository sessionRepository, ILessonAssignmentRepository assignmentRepository, IUnitOfWork unitOfWork)
+        public UpdateLessonSessionsHandler(ILessonSessionRepository sessionRepository, IUnitOfWork unitOfWork)
         {
             _sessionRepository = sessionRepository;
-            _assignmentRepository = assignmentRepository;
             _unitOfWork = unitOfWork;
         }
         public async Task<LessonSessionDto> Handle(UpdateLessonSessionCommand request , CancellationToken cancellationToken)
@@ -25,13 +23,6 @@ namespace Charbagh.Application.LessonSessions.Update
             if (lessonSession == null)
             {
                 throw new LessonSessionNotFoundException(request.Id);
-            }
-
-            var lessonAssignment = await _assignmentRepository.GetByIdAsync(request.LessonAssignmentId, cancellationToken);
-
-            if(lessonAssignment == null)
-            {
-                throw new LessonAssignmentNotFoundException(request.LessonAssignmentId);
             }
 
             var sessionExists = await _sessionRepository.ExistsByLessonAssignmentAndDateAsync(\n                request.LessonAssignmentId, request.SessionDate, request.Id, cancellationToken);\n\n            if (sessionExists)\n                throw new DuplicateLessonSessionException(request.LessonAssignmentId, request.SessionDate);\n\n            lessonSession.Update(
