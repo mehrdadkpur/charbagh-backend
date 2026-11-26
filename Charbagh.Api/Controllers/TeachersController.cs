@@ -8,6 +8,8 @@ using Charbagh.Application.Teachers.Suspend;
 using Charbagh.Application.Teachers.Unblock;
 using Charbagh.Application.Teachers.Update;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Charbagh.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Charbagh.Api.Controllers;
@@ -42,6 +44,50 @@ public sealed class TeachersController : ControllerBase
         var result =await _mediator.Send(new GetAllTeachersQuery(), cancellationToken);
 
         return Ok(result);
+    }
+
+    // Public website endpoints expose only active teacher profile fields.
+    [HttpGet("public")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPublicTeachers(CancellationToken cancellationToken)
+    {
+        var teachers = await _mediator.Send(new GetAllTeachersQuery(), cancellationToken);
+
+        return Ok(teachers
+            .Where(teacher => teacher.Status == TeacherStatus.Active)
+            .Select(teacher => new
+            {
+                teacher.Id,
+                teacher.FirstName,
+                teacher.LastName,
+                teacher.ProfileImageUrl,
+                teacher.Education,
+                teacher.ExperienceYears,
+                teacher.Biography,
+                teacher.Status
+            }));
+    }
+
+    [HttpGet("public/{id:guid}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPublicTeacher(Guid id, CancellationToken cancellationToken)
+    {
+        var teacher = await _mediator.Send(new GetTeacherByIdQuery(id), cancellationToken);
+
+        if (teacher.Status != TeacherStatus.Active)
+            return NotFound();
+
+        return Ok(new
+        {
+            teacher.Id,
+            teacher.FirstName,
+            teacher.LastName,
+            teacher.ProfileImageUrl,
+            teacher.Education,
+            teacher.ExperienceYears,
+            teacher.Biography,
+            teacher.Status
+        });
     }
 
     [HttpGet("{id:guid}")]
