@@ -1,5 +1,6 @@
 using Charbagh.Api.Authorization;
 using Charbagh.Application.Galleries.GetAll;
+using Charbagh.Application.Galleries.GetById;
 using Charbagh.Application.GalleryItems.ChangeSortOrder;
 using Charbagh.Application.GalleryItems.Create;
 using Charbagh.Application.GalleryItems.Delete;
@@ -50,6 +51,19 @@ public sealed class GalleryItemsController : ControllerBase
             result = result.Where(item => item.MediaType == mediaType.Value);
 
         return Ok(result);
+    }
+
+    [HttpGet("public/{id:guid}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPublicById(Guid id, CancellationToken cancellationToken)
+    {
+        var item = await _sender.Send(new GetGalleryItemByIdQuery(id), cancellationToken);
+        var gallery = await _sender.Send(new GetGalleryByIdQuery(item.GalleryId), cancellationToken);
+
+        if (gallery.Status != GalleryStatus.Published)
+            return NotFound();
+
+        return Ok(item);
     }
 
     [HttpGet("{id:guid}")]
