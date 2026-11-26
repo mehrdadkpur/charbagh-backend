@@ -102,6 +102,12 @@ public sealed class Payment : BaseEntity
 
         ValidateAmount(amount);
 
+        if (amount != Amount)
+        {
+            throw new InvalidOperationException(
+                "Payment amount is immutable. Use a refund or adjustment transaction to correct financial amounts.");
+        }
+
         PaymentMethodId = paymentMethodId;
         PaidByUserId = paidByUserId;
         Amount = amount;
