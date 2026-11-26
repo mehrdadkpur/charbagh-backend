@@ -28,10 +28,10 @@ namespace Charbagh.Application.BookItems.Update
                 throw new BookItemNotFoundException(request.Id);
             }
 
-            var excistBook = await _bookRepository.GetByIdAsync(request.Id, cancellationToken);
+            var excistBook = await _bookRepository.GetByIdAsync(bookItem.BookId, cancellationToken);
             if (excistBook is null)
             {
-                throw new BookNotFoundException(request.BookId);
+                throw new BookNotFoundException(bookItem.BookId);
             }
 
             bookItem.Update(
