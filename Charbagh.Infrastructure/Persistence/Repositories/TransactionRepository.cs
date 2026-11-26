@@ -41,6 +41,12 @@ public sealed class TransactionRepository : ITransactionRepository
         CancellationToken cancellationToken)
     {
         return await _context.Transactions
+            .Include(x => x.Payment)
+                .ThenInclude(x => x.Invoice)
+                    .ThenInclude(x => x.Items)
+            .Include(x => x.Payment)
+                .ThenInclude(x => x.Invoice)
+                    .ThenInclude(x => x.Discount)
             .FirstOrDefaultAsync(
                 x => x.Id == id,
                 cancellationToken);
