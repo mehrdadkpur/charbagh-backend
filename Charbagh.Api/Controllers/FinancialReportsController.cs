@@ -52,9 +52,29 @@ public sealed class FinancialReportsController : ControllerBase
                         x.Status != InvoiceStatus.Cancelled)
             .ToList();
 
-        var paymentPeriod = allPayments
+        var paymentRecordsInPeriod = allPayments
             .Where(x => x.PaymentDate >= start && x.PaymentDate < endExclusive)
             .OrderBy(x => x.PaymentDate)
+            .ToList();
+
+        var paymentReceiptTransactions = transactions
+            .Where(x => x.Type == TransactionType.PaymentReceived)
+            .ToList();
+
+        var paymentIdsWithReceiptTransactions = paymentReceiptTransactions
+            .Select(x => x.PaymentId)
+            .ToHashSet();
+
+        var successfulReceiptPaymentIds = paymentReceiptTransactions
+            .Where(x => x.Status == TransactionStatus.Successful)
+            .Select(x => x.PaymentId)
+            .ToHashSet();
+
+        // Legacy payments without receipt transactions remain recognized as received.
+        // New payments are counted only after their receipt transaction succeeds.
+        var paymentPeriod = paymentRecordsInPeriod
+            .Where(x => successfulReceiptPaymentIds.Contains(x.Id) ||
+                        !paymentIdsWithReceiptTransactions.Contains(x.Id))
             .ToList();
 
         var refundPeriod = transactions
