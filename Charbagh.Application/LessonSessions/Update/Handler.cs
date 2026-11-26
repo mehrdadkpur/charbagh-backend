@@ -34,7 +34,7 @@ namespace Charbagh.Application.LessonSessions.Update
                 throw new LessonAssignmentNotFoundException(request.LessonAssignmentId);
             }
 
-            lessonSession.Update(
+            var sessionExists = await _sessionRepository.ExistsByLessonAssignmentAndDateAsync(\n                request.LessonAssignmentId, request.SessionDate, request.Id, cancellationToken);\n\n            if (sessionExists)\n                throw new DuplicateLessonSessionException(request.LessonAssignmentId, request.SessionDate);\n\n            lessonSession.Update(
                 request.SessionDate,
                 request.StartTime,
                 request.EndTime,
