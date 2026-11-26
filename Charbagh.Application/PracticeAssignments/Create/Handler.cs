@@ -34,7 +34,8 @@ namespace Charbagh.Application.PracticeAssignments.Create
                 request.FromReference,
                 request.ToReference,
                 request.Instruction,
-                request.DueDate
+                request.DueDate,
+                request.Priority
                 );
 
             await _practiceAssignmentRepository.AddAsync(practiceAssignment, cancellationToken);
