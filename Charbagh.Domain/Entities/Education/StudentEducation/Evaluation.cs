@@ -62,6 +62,9 @@ namespace Charbagh.Domain.Entities.Education.StudentEducation
         { 
             if (lessonSessionId == Guid.Empty) 
                 throw new ArgumentException("Lesson session is required.", nameof(lessonSessionId));
+
+            if (!Enum.IsDefined(typeof(PracticeCompletionStatus), practiceStatus))
+                throw new ArgumentOutOfRangeException(nameof(practiceStatus), "Practice completion status is invalid.");
             
             if (evaluatedByUserId == Guid.Empty) 
                 throw new ArgumentException("Evaluator user is required.", nameof(evaluatedByUserId));
@@ -94,6 +97,8 @@ namespace Charbagh.Domain.Entities.Education.StudentEducation
             string? teacherComment
             ) 
         { 
+            if (!Enum.IsDefined(typeof(PracticeCompletionStatus), practiceStatus))
+                throw new ArgumentOutOfRangeException(nameof(practiceStatus), "Practice completion status is invalid.");
             ValidateScore(score); 
             PracticeStatus = practiceStatus; 
             Score = score; 
