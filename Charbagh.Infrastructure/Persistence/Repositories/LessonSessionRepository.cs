@@ -22,7 +22,7 @@ namespace Charbagh.Infrastructure.Persistence.Repositories
 
         public async Task<bool> ExistsByLessonAssignmentAndDateAsync(Guid lessonAssignmentId, DateTime sessionDate, Guid? excludeLessonSessionId, CancellationToken cancellationToken)
         {
-            return await _context.LessonSessions.AnyAsync(x => x.LessonAssignmentId == lessonAssignmentId && x.SessionDate == sessionDate, cancellationToken);
+            return await _context.LessonSessions.AnyAsync(\n                x => x.LessonAssignmentId == lessonAssignmentId\n                     && x.SessionDate == sessionDate\n                     && (!excludeLessonSessionId.HasValue || x.Id != excludeLessonSessionId.Value),\n                cancellationToken);
         }
 
         public async Task<IReadOnlyList<LessonSession>> GetAllAsync(CancellationToken cancellationToken)
