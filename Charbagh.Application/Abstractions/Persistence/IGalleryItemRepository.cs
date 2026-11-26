@@ -11,5 +11,7 @@ namespace Charbagh.Application.Abstractions.Persistence
 
         Task<IReadOnlyList<GalleryItem>> GetAllAsync(CancellationToken cancellationToken);
 
+        void Remove(GalleryItem galleryItem);
+
     }
 }
