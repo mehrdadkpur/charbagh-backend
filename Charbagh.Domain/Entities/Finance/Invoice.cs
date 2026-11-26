@@ -288,6 +288,34 @@ public sealed class Invoice : BaseEntity
     }
 
 
+    public void RefundPayment(decimal amount)
+    {
+        if (Status == InvoiceStatus.Draft ||
+            Status == InvoiceStatus.Cancelled)
+        {
+            throw new InvalidOperationException(
+                "Draft or cancelled invoices cannot be refunded.");
+        }
+
+        if (amount <= 0)
+        {
+            throw new ArgumentException(
+                "Refund amount must be greater than zero.",
+                nameof(amount));
+        }
+
+        if (amount > PaidAmount)
+        {
+            throw new InvalidOperationException(
+                "Refund amount cannot be greater than the paid amount.");
+        }
+
+        PaidAmount -= amount;
+        UpdatePaymentStatus();
+        MarkAsUpdated();
+    }
+
+
     // Payment Status
 
     private void UpdatePaymentStatus()
