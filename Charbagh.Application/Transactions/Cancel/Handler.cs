@@ -30,7 +30,7 @@ public sealed class MarkTransactionCancelHandler: IRequestHandler< CancelTransac
             throw new KeyNotFoundException(
                 "Transaction was not found.");
 
-        transaction.Cancel();
+        transaction.Cancel(request.Description);
 
         await _unitOfWork.SaveChangesAsync(
             cancellationToken);
