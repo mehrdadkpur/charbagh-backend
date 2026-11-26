@@ -6,6 +6,7 @@ using Charbagh.Application.Users.Create;
 using Charbagh.Application.Users.GetAll;
 using Charbagh.Application.Users.GetById;
 using Charbagh.Application.Users.GetByNationalCode;
+using Charbagh.Application.Users.ResetPassword;
 using Charbagh.Application.Users.Suspend;
 using Charbagh.Application.Users.Unblock;
 using Charbagh.Application.Users.Update;
@@ -120,6 +121,19 @@ public sealed class UsersController : ControllerBase
     {
         var result = await _mediator.Send(
             new UnblockUserCommand(id),
+            cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpPost("{id:guid}/reset-password")]
+    [HasPermission("Users", PermissionAction.Manage)]
+    public async Task<IActionResult> ResetPassword(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new ResetUserPasswordCommand(id),
             cancellationToken);
 
         return Ok(result);
