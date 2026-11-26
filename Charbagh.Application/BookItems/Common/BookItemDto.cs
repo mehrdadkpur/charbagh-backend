@@ -14,6 +14,7 @@ namespace Charbagh.Application.BookItems.Common
         int DifficultyLevel,
         string? AudioUrl,
         string? VideoUrl,
-        string? PdfUrl
+        string? PdfUrl,
+        bool IsActive
         );
 }
