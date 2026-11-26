@@ -55,13 +55,39 @@ public sealed class CreateTransactionHandler
                 "Transaction type is invalid.",
                 nameof(request.Type));
 
+        var relatedTransactions =
+            await _transactionRepository.GetByPaymentIdAsync(
+                payment.Id,
+                cancellationToken);
+
+        if (request.Type == TransactionType.PaymentReceived)
+        {
+            var hasActiveReceipt = relatedTransactions.Any(x =>
+                x.Type == TransactionType.PaymentReceived &&
+                (x.Status == TransactionStatus.Pending ||
+                 x.Status == TransactionStatus.Successful));
+
+            if (hasActiveReceipt)
+            {
+                throw new InvalidOperationException(
+                    "A pending or successful receipt transaction already exists for this payment.");
+            }
+
+            if (request.Amount != payment.Amount)
+            {
+                throw new InvalidOperationException(
+                    "Receipt transaction amount must equal the payment amount.");
+            }
+
+            if (request.Amount > payment.Invoice.RemainingAmount)
+            {
+                throw new InvalidOperationException(
+                    "Receipt transaction amount exceeds the invoice remaining amount.");
+            }
+        }
+
         if (request.Type == TransactionType.Refund)
         {
-            var relatedTransactions =
-                await _transactionRepository.GetByPaymentIdAsync(
-                    payment.Id,
-                    cancellationToken);
-
             var alreadyReserved = relatedTransactions
                 .Where(x => x.Type == TransactionType.Refund &&
                             (x.Status == TransactionStatus.Pending ||
