@@ -7,7 +7,7 @@ namespace Charbagh.Application.Galleries.Update
     public sealed record UpdateGalleryCommand(
         Guid Id , 
         string Title , 
-        string Description , 
-        string CoverImageUrl
+        string? Description , 
+        string? CoverImageUrl
         ) : IRequest<GalleryDto>;
 }
