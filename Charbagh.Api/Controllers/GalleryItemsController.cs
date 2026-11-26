@@ -37,6 +37,7 @@ public sealed class GalleryItemsController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetPublic(
         [FromQuery] GalleryMediaType? mediaType,
+        [FromQuery] Guid? galleryId,
         CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetAllGalleryItemsQuery(), cancellationToken);
@@ -49,6 +50,8 @@ public sealed class GalleryItemsController : ControllerBase
         var result = items.Where(item => publishedGalleryIds.Contains(item.GalleryId));
         if (mediaType.HasValue)
             result = result.Where(item => item.MediaType == mediaType.Value);
+        if (galleryId.HasValue)
+            result = result.Where(item => item.GalleryId == galleryId.Value);
 
         return Ok(result);
     }
