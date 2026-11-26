@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Charbagh.Application.BookItems.Create;
 using Charbagh.Application.BookItems.GetById;
-using Charbagh.Application.Bookitems.GetAll;
+using Charbagh.Application.BookItems.GetAll;
 using Charbagh.Application.BookItems.Update;
 using Charbagh.Application.BookItems.Deactivate;
 using Charbagh.Application.BookItems.Activate;
@@ -25,13 +25,13 @@ public sealed class BookItemsController : ControllerBase
     {
         var result = await _mediator.Send(command, cancellationToken);
 
-        return CreatedAtAction( nameof(Application.Bookitems.GetById), new { id = result.Id }, result);
+        return CreatedAtAction( nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll ( CancellationToken cancellationToken)
     {
-        var result =await _mediator.Send(new GetAllBooksQuery(), cancellationToken);
+        var result =await _mediator.Send(new GetallBookItemsQuery(), cancellationToken);
 
         return Ok(result);
     }
