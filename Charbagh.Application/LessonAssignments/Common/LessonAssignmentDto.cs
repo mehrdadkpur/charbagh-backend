@@ -11,6 +11,7 @@ namespace Charbagh.Application.LessonAssignments.Common
         DateOnly? EndDate,
         decimal SessionFee,
         PaymentPlanType PaymentPlan,
-        string? Notes
+        string? Notes,
+        LessonAssignmentStatus Status
         );
 }
