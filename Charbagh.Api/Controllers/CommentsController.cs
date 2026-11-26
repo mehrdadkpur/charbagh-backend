@@ -7,6 +7,8 @@ using Charbagh.Application.Comments.SetApprove;
 using Charbagh.Application.Comments.SetPending;
 using Charbagh.Application.Comments.SetReject;
 using Charbagh.Application.Comments.Update;
+using Charbagh.Api.Authorization;
+using Charbagh.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,6 +65,7 @@ public class CommentsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [HasPermission("Comments", PermissionAction.Update)]
     public async Task<IActionResult> Update( Guid id, UpdateCommentCommand command, CancellationToken cancellationToken)
     {
         if (id != command.Id)
@@ -74,6 +77,7 @@ public class CommentsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/approve")]
+    [HasPermission("Comments", PermissionAction.Manage)]
     public async Task<IActionResult> SetApprove( Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send( new SetApproveCommentCommand(id), cancellationToken);
@@ -82,6 +86,7 @@ public class CommentsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/pending")]
+    [HasPermission("Comments", PermissionAction.Manage)]
     public async Task<IActionResult> SetPending( Guid id,CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new SetPendingCommentCommand(id), cancellationToken);
@@ -90,6 +95,7 @@ public class CommentsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/reject")]
+    [HasPermission("Comments", PermissionAction.Manage)]
     public async Task<IActionResult> SetReject(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new SetRejectCommentCommand(id), cancellationToken);
