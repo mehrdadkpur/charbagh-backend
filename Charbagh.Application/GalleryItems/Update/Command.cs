@@ -7,5 +7,6 @@ namespace Charbagh.Application.GalleryItems.Update
         Guid Id , 
         string? Title,
         string? Description,
-        string? ThumbnailUrl) : IRequest<GalleryItemDto>;
+        string? ThumbnailUrl,
+        string FileUrl) : IRequest<GalleryItemDto>;
 }
