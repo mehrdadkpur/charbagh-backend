@@ -1,5 +1,4 @@
-﻿using Charbagh.Application.Attendances.Create;
-using Charbagh.Application.EducationServices.Activate;
+﻿using Charbagh.Application.EducationServices.Activate;
 using Charbagh.Application.EducationServices.Create;
 using Charbagh.Application.EducationServices.Deactivate;
 using Charbagh.Application.EducationServices.GetAll;
