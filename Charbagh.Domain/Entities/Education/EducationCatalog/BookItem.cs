@@ -128,6 +128,12 @@ namespace Charbagh.Domain.Entities.Education.EducationCatalog
                 throw new ArgumentException(
                     "Recommended practice days must be greater than zero.");
 
+            if (!Enum.IsDefined(typeof(BookItemType), type))
+                throw new ArgumentOutOfRangeException(nameof(type), "Book item type is invalid.");
+
+            if (!Enum.IsDefined(typeof(BookReferenceType), referenceType))
+                throw new ArgumentOutOfRangeException(nameof(referenceType), "Book reference type is invalid.");
+
             var bookItem = new BookItem(
                 bookId,
                 displayOrder,
@@ -176,7 +182,14 @@ namespace Charbagh.Domain.Entities.Education.EducationCatalog
                     "Difficulty level must be greater than zero.",
                     nameof(difficultyLevel));
 
-            BookId = BookId;
+            if (recommendedPracticeDays is <= 0)
+                throw new ArgumentException("Recommended practice days must be greater than zero.", nameof(recommendedPracticeDays));
+
+            if (!Enum.IsDefined(typeof(BookItemType), type))
+                throw new ArgumentOutOfRangeException(nameof(type), "Book item type is invalid.");
+
+            if (!Enum.IsDefined(typeof(BookReferenceType), referenceType))
+                throw new ArgumentOutOfRangeException(nameof(referenceType), "Book reference type is invalid.");
 
             DisplayOrder = displayOrder;
 
