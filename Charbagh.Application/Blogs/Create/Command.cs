@@ -5,7 +5,6 @@ using MediatR;
 namespace Charbagh.Application.Blogs.Create
 {
     public sealed record CreateBlogCommand(
-        Guid UserId,
         Guid CategoryId,
         string Title,
         string Text,
