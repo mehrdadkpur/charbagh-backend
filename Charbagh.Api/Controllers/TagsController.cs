@@ -1,10 +1,10 @@
-﻿using Charbagh.Application.Tags.Activate;
+using Charbagh.Api.Authorization;
+using Charbagh.Application.Tags.Activate;
 using Charbagh.Application.Tags.Create;
 using Charbagh.Application.Tags.Deactivate;
 using Charbagh.Application.Tags.GetAll;
 using Charbagh.Application.Tags.GetById;
 using Charbagh.Application.Tags.Update;
-using Charbagh.Api.Authorization;
 using Charbagh.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -24,39 +24,38 @@ public sealed class TagsController : ControllerBase
 
     [HttpPost]
     [HasPermission("Tags", PermissionAction.Create)]
-    public async Task<IActionResult> Create( CreateTagCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(CreateTagCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-
-        return CreatedAtAction( nameof(Application.Tags.GetById), new { id = result.Id }, result);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll ( CancellationToken cancellationToken)
+    [HasPermission("Tags", PermissionAction.View)]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var result =await _mediator.Send(new GetAllTagsQuery(), cancellationToken);
-
+        var result = await _mediator.Send(new GetAllTagsQuery(), cancellationToken);
         return Ok(result);
     }
 
-    [HttpGet("{id:guid}")]\n    [HasPermission("Tags", PermissionAction.View)]
-    public async Task<IActionResult> GetById(Guid id , CancellationToken cancellationToken)
-        {
-            var result = await _mediator.Send(new GetTagByIdQuery(id), cancellationToken);
-            return Ok(result);
-
-        }
+    [HttpGet("{id:guid}")]
+    [HasPermission("Tags", PermissionAction.View)]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetTagByIdQuery(id), cancellationToken);
+        return Ok(result);
+    }
 
     [HttpPatch("{id:guid}/activate")]
     [HasPermission("Tags", PermissionAction.Update)]
-    public async Task<IActionResult> Activate(Guid id , CancellationToken cancellationToken)
+    public async Task<IActionResult> Activate(Guid id, CancellationToken cancellationToken)
     {
-        var result =await _mediator.Send(new ActivateTagCommand(id), cancellationToken);
+        var result = await _mediator.Send(new ActivateTagCommand(id), cancellationToken);
         return Ok(result);
     }
 
     [HttpPatch("{id:guid}/deactivate")]
-    [HasPermission("Tags", PermissionAction.Manage)]
+    [HasPermission("Tags", PermissionAction.Update)]
     public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new DeactivateTagCommand(id), cancellationToken);
@@ -68,9 +67,8 @@ public sealed class TagsController : ControllerBase
     public async Task<IActionResult> Update(Guid id, UpdateTagCommand command, CancellationToken cancellationToken)
     {
         if (id != command.Id)
-        {
             return BadRequest();
-        }
+
         var result = await _mediator.Send(command, cancellationToken);
         return Ok(result);
     }
