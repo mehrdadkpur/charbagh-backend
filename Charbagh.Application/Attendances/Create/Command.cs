@@ -11,7 +11,6 @@ namespace Charbagh.Application.Attendances.Create
         DateTime? CheckOutAt,
         string? Reason,
         string? Note,
-        Guid? RecordedByUserId,
-        DateTime RecordedAt
+        Guid? RecordedByUserId
         ) :IRequest<AttendanceDto>;
 }
