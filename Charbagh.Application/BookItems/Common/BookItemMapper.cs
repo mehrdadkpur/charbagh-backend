@@ -19,7 +19,8 @@ namespace Charbagh.Application.BookItems.Common
                 bookItem.DifficultyLevel,
                 bookItem.AudioUrl,
                 bookItem.VideoUrl,
-                bookItem.PdfUrl
+                bookItem.PdfUrl,
+                bookItem.IsActive
                 );
         }
     }
