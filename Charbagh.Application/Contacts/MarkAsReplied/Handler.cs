@@ -26,6 +26,7 @@ namespace Charbagh.Application.Contacts.MarkAsReplied
             }
 
             contact.MarkAsReplied();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return contact.ToDto();
         }
