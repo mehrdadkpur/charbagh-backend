@@ -39,7 +39,7 @@ public sealed class TagsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}")]\n    [HasPermission("Tags", PermissionAction.View)]
     public async Task<IActionResult> GetById(Guid id , CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetTagByIdQuery(id), cancellationToken);
@@ -48,7 +48,7 @@ public sealed class TagsController : ControllerBase
         }
 
     [HttpPatch("{id:guid}/activate")]
-    [HasPermission("Tags", PermissionAction.Manage)]
+    [HasPermission("Tags", PermissionAction.Update)]
     public async Task<IActionResult> Activate(Guid id , CancellationToken cancellationToken)
     {
         var result =await _mediator.Send(new ActivateTagCommand(id), cancellationToken);
