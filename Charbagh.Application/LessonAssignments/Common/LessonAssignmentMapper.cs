@@ -17,7 +17,8 @@ namespace Charbagh.Application.LessonAssignments.Common
                 lessonAssignment.EndDate,
                 lessonAssignment.SessionFee,
                 lessonAssignment.PaymentPlan,
-                lessonAssignment.Notes
+                lessonAssignment.Notes,
+                lessonAssignment.Status
                 );
         }
     }
