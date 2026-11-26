@@ -26,7 +26,7 @@ public sealed class PracticeAssignmentsController : ControllerBase
     {
         var result = await _mediator.Send(command, cancellationToken);
 
-        return CreatedAtAction( nameof(Application.PracticeAssignments.GetById), new { id = result.Id }, result);
+        return CreatedAtAction( nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
