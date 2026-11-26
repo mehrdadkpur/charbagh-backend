@@ -6,6 +6,6 @@ namespace Charbagh.Application.Categories.Create
 {
     public sealed record CreateCategoryCommand(
         string Name,
-        string Description
+        string? Description
         ) :IRequest<CategoryDto>;
 }
