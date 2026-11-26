@@ -21,17 +21,17 @@ public sealed class InstrumentsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create( CreatebookCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create( CreateInstrumentCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
 
-        return CreatedAtAction( nameof(Application.Instruments.GetById), new { id = result.Id }, result);
+        return CreatedAtAction( nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll ( CancellationToken cancellationToken)
     {
-        var result =await _mediator.Send(new GetAllUserssQuery(), cancellationToken);
+        var result =await _mediator.Send(new GetAllInstrumentsQuery(), cancellationToken);
 
         return Ok(result);
     }
