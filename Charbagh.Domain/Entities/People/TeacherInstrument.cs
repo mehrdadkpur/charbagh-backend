@@ -61,7 +61,7 @@
             Guid? defaultBookId = null)
         {
             ValidateIds(teacherId, instrumentId);
-
+            ValidateTeachingLevel(teachingLevel);
             ValidateSessionFee(defaultSessionFee);
 
             var teacherInstrument = new TeacherInstrument(
@@ -84,6 +84,7 @@
             decimal? defaultSessionFee,
             Guid? defaultBookId)
         {
+            ValidateTeachingLevel(teachingLevel);
             ValidateSessionFee(defaultSessionFee);
 
             TeachingLevel = teachingLevel;
@@ -150,6 +151,12 @@
                     nameof(instrumentId));
         }
 
+
+        private static void ValidateTeachingLevel(TeachingLevel teachingLevel)
+        {
+            if (!Enum.IsDefined(typeof(TeachingLevel), teachingLevel))
+                throw new ArgumentOutOfRangeException(nameof(teachingLevel), "Teaching level is invalid.");
+        }
 
         private static void ValidateSessionFee(
             decimal? sessionFee)
