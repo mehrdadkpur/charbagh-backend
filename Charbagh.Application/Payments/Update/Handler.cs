@@ -1,4 +1,4 @@
-﻿using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Application.Payments.Common;
 using MediatR;
 
@@ -8,17 +8,23 @@ public sealed class UpdatePaymentHandler
     : IRequestHandler<UpdatePaymentCommand, PaymentDto>
 {
     private readonly IPaymentRepository _paymentRepository;
+    private readonly IInvoiceRepository _invoiceRepository;
+    private readonly ITransactionRepository _transactionRepository;
     private readonly IPaymentMethodRepository _paymentMethodRepository;
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdatePaymentHandler(
         IPaymentRepository paymentRepository,
+        IInvoiceRepository invoiceRepository,
+        ITransactionRepository transactionRepository,
         IPaymentMethodRepository paymentMethodRepository,
         IUserRepository userRepository,
         IUnitOfWork unitOfWork)
     {
         _paymentRepository = paymentRepository;
+        _invoiceRepository = invoiceRepository;
+        _transactionRepository = transactionRepository;
         _paymentMethodRepository = paymentMethodRepository;
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
@@ -28,27 +34,40 @@ public sealed class UpdatePaymentHandler
         UpdatePaymentCommand request,
         CancellationToken cancellationToken)
     {
-        var payment = await _paymentRepository
-            .GetForUpdateAsync(
-                request.Id,
-                cancellationToken);
+        var payment = await _paymentRepository.GetForUpdateAsync(
+            request.Id,
+            cancellationToken);
 
         if (payment is null)
-            throw new KeyNotFoundException(
-                "Payment was not found.");
+            throw new KeyNotFoundException("Payment was not found.");
 
-        var paymentMethod = await _paymentMethodRepository
-            .GetByIdAsync(
-                request.PaymentMethodId,
+        var relatedTransactions =
+            await _transactionRepository.GetByPaymentIdAsync(
+                payment.Id,
                 cancellationToken);
 
+        if (relatedTransactions.Count > 0)
+        {
+            throw new InvalidOperationException(
+                "Payments linked to transactions cannot be edited. Create an adjustment or refund transaction instead.");
+        }
+
+        var invoice = await _invoiceRepository.GetForUpdateAsync(
+            payment.InvoiceId,
+            cancellationToken);
+
+        if (invoice is null)
+            throw new KeyNotFoundException("Invoice was not found.");
+
+        var paymentMethod = await _paymentMethodRepository.GetByIdAsync(
+            request.PaymentMethodId,
+            cancellationToken);
+
         if (paymentMethod is null)
-            throw new KeyNotFoundException(
-                "Payment method was not found.");
+            throw new KeyNotFoundException("Payment method was not found.");
 
         if (!paymentMethod.IsActive)
-            throw new InvalidOperationException(
-                "Selected payment method is inactive.");
+            throw new InvalidOperationException("Selected payment method is inactive.");
 
         if (request.PaidByUserId.HasValue)
         {
@@ -57,9 +76,10 @@ public sealed class UpdatePaymentHandler
                 cancellationToken);
 
             if (user is null)
-                throw new KeyNotFoundException(
-                    "Paid by user was not found.");
+                throw new KeyNotFoundException("Paid by user was not found.");
         }
+
+        invoice.UpdatePaymentAmount(payment.Amount, request.Amount);
 
         payment.Update(
             request.PaymentMethodId,
@@ -69,8 +89,7 @@ public sealed class UpdatePaymentHandler
             request.ReferenceNumber,
             request.Note);
 
-        await _unitOfWork.SaveChangesAsync(
-            cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return payment.ToDto();
     }
