@@ -39,7 +39,7 @@ public sealed class CategoriesController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}")]\n    [HasPermission("Categories", PermissionAction.View)]
     public async Task<IActionResult> GetById(Guid id , CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetCategoryByIdQuery(id), cancellationToken);
@@ -48,7 +48,7 @@ public sealed class CategoriesController : ControllerBase
         }
 
     [HttpPatch("{id:guid}/activate")]
-    [HasPermission("Categories", PermissionAction.Manage)]
+    [HasPermission("Categories", PermissionAction.Update)]
     public async Task<IActionResult> Activate(Guid id , CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new ActivateCategoryCommand(id), cancellationToken);
