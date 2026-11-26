@@ -10,6 +10,7 @@ namespace Charbagh.Application.LessonContents.Common
                 lessonContent.Id,
                 lessonContent.LessonSessionId,
                 lessonContent.BookItemId,
+                lessonContent.Type,
                 lessonContent.FromReference,
                 lessonContent.ToReference,
                 lessonContent.TeacherNote
