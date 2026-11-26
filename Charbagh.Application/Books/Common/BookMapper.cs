@@ -16,7 +16,8 @@ namespace Charbagh.Application.Bookitems.Common
                 book.Volume,
                 book.Level,
                 book.CoverImageUrl,
-                book.DisplayOrder
+                book.DisplayOrder,
+                book.IsActive
                 );
         }
     }
