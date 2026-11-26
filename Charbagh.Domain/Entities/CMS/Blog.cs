@@ -104,10 +104,18 @@ public sealed class Blog : BaseEntity
     // Update
 
     public void Update(
+        Guid categoryId,
         string title,
         string text,
         string? imageUrl)
     {
+        if (categoryId == Guid.Empty)
+        {
+            throw new ArgumentException(
+                "Blog category is required.",
+                nameof(categoryId));
+        }
+
         if (string.IsNullOrWhiteSpace(title))
         {
             throw new ArgumentException(
@@ -134,6 +142,7 @@ public sealed class Blog : BaseEntity
                 "Archived blogs cannot be updated.");
         }
 
+        CategoryId = categoryId;
         Title = title.Trim();
         Text = text.Trim();
         ImageUrl = imageUrl?.Trim();
