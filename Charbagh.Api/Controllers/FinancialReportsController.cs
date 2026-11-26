@@ -10,15 +10,18 @@ public sealed class FinancialReportsController : ControllerBase
     private readonly IInvoiceRepository _invoiceRepository;
     private readonly IPaymentRepository _paymentRepository;
     private readonly IStudentRepository _studentRepository;
+    private readonly ITransactionRepository _transactionRepository;
 
     public FinancialReportsController(
         IInvoiceRepository invoiceRepository,
         IPaymentRepository paymentRepository,
-        IStudentRepository studentRepository)
+        IStudentRepository studentRepository,
+        ITransactionRepository transactionRepository)
     {
         _invoiceRepository = invoiceRepository;
         _paymentRepository = paymentRepository;
         _studentRepository = studentRepository;
+        _transactionRepository = transactionRepository;
     }
 
     [HttpGet("summary")]
@@ -38,6 +41,7 @@ public sealed class FinancialReportsController : ControllerBase
         var allInvoices = await _invoiceRepository.GetAllAsync(cancellationToken);
         var allPayments = await _paymentRepository.GetAllAsync(cancellationToken);
         var students = await _studentRepository.GetAllAsync(cancellationToken);
+        var transactions = await _transactionRepository.GetAllAsync(cancellationToken);
 
         var invoicePeriod = allInvoices
             .Where(x => x.InvoiceDate >= start && x.InvoiceDate < endExclusive)
@@ -53,12 +57,29 @@ public sealed class FinancialReportsController : ControllerBase
             .OrderBy(x => x.PaymentDate)
             .ToList();
 
+        var refundPeriod = transactions
+            .Where(x => x.Type == TransactionType.Refund &&
+                        x.Status == TransactionStatus.Successful &&
+                        x.TransactionDate >= start &&
+                        x.TransactionDate < endExclusive)
+            .OrderBy(x => x.TransactionDate)
+            .ToList();
+
+        var cashFlowEvents = paymentPeriod
+            .Select(x => new { Date = x.PaymentDate.Date, Amount = x.Amount })
+            .Concat(refundPeriod.Select(x => new
+            {
+                Date = x.TransactionDate.Date,
+                Amount = -x.Amount
+            }))
+            .ToList();
+
         var studentNames = students.ToDictionary(
             x => x.Id,
             x => x.User.FullName);
 
-        var dailyPayments = paymentPeriod
-            .GroupBy(x => x.PaymentDate.Date)
+        var dailyPayments = cashFlowEvents
+            .GroupBy(x => x.Date)
             .OrderBy(x => x.Key)
             .Select(group => new
             {
@@ -68,8 +89,8 @@ public sealed class FinancialReportsController : ControllerBase
             })
             .ToList();
 
-        var monthlyPayments = paymentPeriod
-            .GroupBy(x => new DateTime(x.PaymentDate.Year, x.PaymentDate.Month, 1))
+        var monthlyPayments = cashFlowEvents
+            .GroupBy(x => new DateTime(x.Date.Year, x.Date.Month, 1))
             .OrderBy(x => x.Key)
             .Select(group => new
             {
@@ -155,6 +176,15 @@ public sealed class FinancialReportsController : ControllerBase
                 paymentMethodId = x.PaymentMethodId,
                 referenceNumber = x.ReferenceNumber,
                 note = x.Note
+            }),
+            refunds = refundPeriod.Select(x => new
+            {
+                id = x.Id,
+                paymentId = x.PaymentId,
+                transactionDate = x.TransactionDate,
+                amount = x.Amount,
+                referenceNumber = x.ReferenceNumber,
+                description = x.Description
             })
         });
     }
