@@ -380,6 +380,12 @@ public sealed class Invoice : BaseEntity
                 "Paid invoices cannot be cancelled.");
         }
 
+        if (PaidAmount > 0)
+        {
+            throw new InvalidOperationException(
+                "Invoices with received payments must be fully refunded before cancellation.");
+        }
+
         if (Status == InvoiceStatus.Cancelled)
         {
             return;
