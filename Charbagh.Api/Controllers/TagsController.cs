@@ -4,6 +4,8 @@ using Charbagh.Application.Tags.Deactivate;
 using Charbagh.Application.Tags.GetAll;
 using Charbagh.Application.Tags.GetById;
 using Charbagh.Application.Tags.Update;
+using Charbagh.Api.Authorization;
+using Charbagh.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +23,7 @@ public sealed class TagsController : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission("Tags", PermissionAction.Create)]
     public async Task<IActionResult> Create( CreateTagCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
@@ -45,6 +48,7 @@ public sealed class TagsController : ControllerBase
         }
 
     [HttpPatch("{id:guid}/activate")]
+    [HasPermission("Tags", PermissionAction.Manage)]
     public async Task<IActionResult> Activate(Guid id , CancellationToken cancellationToken)
     {
         var result =await _mediator.Send(new ActivateTagCommand(id), cancellationToken);
@@ -52,6 +56,7 @@ public sealed class TagsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/deactivate")]
+    [HasPermission("Tags", PermissionAction.Manage)]
     public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new DeactivateTagCommand(id), cancellationToken);
@@ -59,6 +64,7 @@ public sealed class TagsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [HasPermission("Tags", PermissionAction.Update)]
     public async Task<IActionResult> Update(Guid id, UpdateTagCommand command, CancellationToken cancellationToken)
     {
         if (id != command.Id)
