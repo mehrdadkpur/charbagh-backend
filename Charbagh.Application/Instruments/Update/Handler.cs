@@ -32,7 +32,7 @@ public sealed record UpdateInstrumentHandler: IRequestHandler<UpdateInstrumentCo
             throw new DuplicateInstrumentException(request.Name);
         }
 
-        instrument.Update(request.InstrumentCategoryId, request.Name, request.Description, request.EnglishName);
+        instrument.Update(request.InstrumentCategoryId, request.Name, request.EnglishName, request.Description);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return instrument.ToDto();
