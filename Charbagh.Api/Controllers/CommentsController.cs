@@ -25,7 +25,7 @@ public class CommentsController : ControllerBase
         _sender = sender;
     }
 
-    [HttpPost]
+    [HttpPost]\n    [HasPermission("Comments", PermissionAction.Create)]
     public async Task<IActionResult> Create( CreateCommentCommand command,CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
@@ -36,7 +36,7 @@ public class CommentsController : ControllerBase
             result);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}")]\n    [HasPermission("Comments", PermissionAction.View)]
     public async Task<IActionResult> GetById( Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetCommentByIdQuery(id),cancellationToken);
@@ -53,14 +53,14 @@ public class CommentsController : ControllerBase
     [HttpGet("user/{userId:guid}")]
     public async Task<IActionResult> GetByUserId(Guid id,CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new GetCommentsByUserIdQuery(id), cancellationToken);
+        var result = await _sender.Send(new GetCommentsByUserIdQuery(userId), cancellationToken);
         return Ok(result);
     }
 
     [HttpGet("blog/{blogId:guid}")]
     public async Task<IActionResult> GetByBlogId(Guid id, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new GetCommentsByBlogIdQuery(id), cancellationToken);
+        var result = await _sender.Send(new GetCommentsByBlogIdQuery(blogId), cancellationToken);
         return Ok(result);
     }
 
@@ -77,7 +77,7 @@ public class CommentsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/approve")]
-    [HasPermission("Comments", PermissionAction.Manage)]
+    [HasPermission("Comments", PermissionAction.Approve)]
     public async Task<IActionResult> SetApprove( Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send( new SetApproveCommentCommand(id), cancellationToken);
