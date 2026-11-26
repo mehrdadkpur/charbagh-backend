@@ -36,7 +36,18 @@ namespace Charbagh.Application.Blogs.Create
             await _blogRepository.AddAsync(blog, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return blog.ToDto();
+            return new BlogDto(
+                blog.Id,
+                blog.UserId,
+                blog.CategoryId,
+                user.FirstName,
+                user.LastName,
+                blog.Title,
+                blog.Text,
+                blog.ImageUrl,
+                blog.Status,
+                blog.CreatedAt,
+                blog.UpdatedAt);
         }
     }
 }
