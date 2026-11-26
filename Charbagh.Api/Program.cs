@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Security.Claims;
+using Charbagh.Application.Abstractions.Persistence;
 
 const string FrontendCorsPolicy = "FrontendCors";
 var builder = WebApplication.CreateBuilder(args);
@@ -105,6 +107,39 @@ builder.Services
                 Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
 
             ClockSkew = TimeSpan.Zero
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var userIdValue = context.Principal?
+                    .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var tokenStamp = context.Principal?
+                    .FindFirst("security_stamp")?.Value;
+
+                if (!Guid.TryParse(userIdValue, out var userId) ||
+                    string.IsNullOrWhiteSpace(tokenStamp))
+                {
+                    context.Fail("Invalid authentication token.");
+                    return;
+                }
+
+                var userRepository = context.HttpContext.RequestServices
+                    .GetRequiredService<IUserRepository>();
+
+                var currentStamp = await userRepository.GetSecurityStampByIdAsync(
+                    userId,
+                    context.HttpContext.RequestAborted);
+
+                if (!string.Equals(
+                    currentStamp,
+                    tokenStamp,
+                    StringComparison.Ordinal))
+                {
+                    context.Fail("This session is no longer valid. Please sign in again.");
+                }
+            }
         };
     });
 
