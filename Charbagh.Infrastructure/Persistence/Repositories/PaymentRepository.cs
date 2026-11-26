@@ -30,6 +30,9 @@ public sealed class PaymentRepository : IPaymentRepository
         return await _context.Payments
             .AsNoTracking()
             .Include(x => x.Invoice)
+                .ThenInclude(x => x.Items)
+            .Include(x => x.Invoice)
+                .ThenInclude(x => x.Discount)
             .Include(x => x.PaymentMethod)
             .Include(x => x.PaidByUser)
             .FirstOrDefaultAsync(
