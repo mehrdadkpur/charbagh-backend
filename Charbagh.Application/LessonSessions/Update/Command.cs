@@ -6,7 +6,6 @@ namespace Charbagh.Application.LessonSessions.Update
 {
     public sealed record UpdateLessonSessionCommand(
         Guid Id,
-        Guid LessonAssignmentId,
         DateTime SessionDate,
         TimeSpan? StartTime,
         TimeSpan? EndTime,
