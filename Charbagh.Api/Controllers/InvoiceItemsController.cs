@@ -2,6 +2,7 @@
 using Charbagh.Application.InvoiceItems.GetAll;
 using Charbagh.Application.InvoiceItems.GetById;
 using Charbagh.Application.InvoiceItems.Update;
+using Charbagh.Application.InvoiceItems.Remove;
 using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Application.InvoiceItems.Common;
 using MediatR;
@@ -13,12 +14,12 @@ namespace Charbagh.Api.Controllers;
 [Route("api/[controller]")]
 public sealed class InvoiceItemsController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly ISender _sender;
     private readonly IInvoiceItemRepository _repository;
 
-    public InvoiceItemsController(IMediator mediator, IInvoiceItemRepository repository)
+    public InvoiceItemsController(ISender sender, IInvoiceItemRepository repository)
     {
-        _mediator = mediator;
+        _sender = sender;
         _repository = repository;
     }
 
@@ -32,7 +33,7 @@ public sealed class InvoiceItemsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create( CreateInvoiceItemCommand command, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command, cancellationToken);
+        var result = await _sender.Send(command, cancellationToken);
 
         return CreatedAtAction( nameof(GetById), new { id = result.Id }, result);
     }
@@ -51,6 +52,13 @@ public sealed class InvoiceItemsController : ControllerBase
             var result = await _mediator.Send(new GetInvoiceItemByIdQuery(id), cancellationToken);
             return Ok(result);
         }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Remove(Guid id, CancellationToken cancellationToken)
+    {
+        await _sender.Send(new RemoveInvoiceItemCommand(id), cancellationToken);
+        return NoContent();
+    }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id,UpdateInvoiceItemCommand command, CancellationToken cancellationToken)
