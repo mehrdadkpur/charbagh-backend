@@ -82,7 +82,7 @@ namespace Charbagh.Domain.Entities.Education.StudentEducation
             TimeSpan? startTime,
             TimeSpan? endTime,
             int? durationMinutes,
-            string teacherNote)
+            string? teacherNote)
         {
 
             if (Status != LessonSessionStatus.Scheduled) 
