@@ -32,7 +32,7 @@ namespace Charbagh.Application.LessonContents.Update
 
             if(bookItem == null)
             {
-                throw new BookItemNotFoundException(request.Id);
+                throw new BookItemNotFoundException(request.BookItemId);
             }
 
             lessonContent.Update(
