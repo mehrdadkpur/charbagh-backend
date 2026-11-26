@@ -95,7 +95,7 @@ public sealed class FinancialReportsController : ControllerBase
             var legacyPayments = allPayments
                 .Where(x => x.InvoiceId == invoice.Id &&
                             !paymentIdsWithReceiptTransactions.Contains(x.Id))
-                .OrderBy(x => x.PaymentDate)
+                .OrderBy(x => x.CreatedAt)
                 .ToList();
 
             foreach (var legacyPayment in legacyPayments)
