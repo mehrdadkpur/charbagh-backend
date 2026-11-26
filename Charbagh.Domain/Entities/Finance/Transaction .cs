@@ -83,13 +83,16 @@ public sealed class Transaction : BaseEntity
         if (Status == TransactionStatus.Successful)
             return;
 
-        Status = TransactionStatus.Successful;
+        EnsurePending();
 
+        Status = TransactionStatus.Successful;
         MarkAsUpdated();
     }
 
     public void MarkAsFailed(string? description = null)
     {
+        EnsurePending();
+
         Status = TransactionStatus.Failed;
 
         if (!string.IsNullOrWhiteSpace(description))
@@ -100,12 +103,23 @@ public sealed class Transaction : BaseEntity
 
     public void Cancel(string? description = null)
     {
+        EnsurePending();
+
         Status = TransactionStatus.Cancelled;
 
         if (!string.IsNullOrWhiteSpace(description))
             Description = description.Trim();
 
         MarkAsUpdated();
+    }
+
+    private void EnsurePending()
+    {
+        if (Status != TransactionStatus.Pending)
+        {
+            throw new InvalidOperationException(
+                "Only pending transactions can change their status.");
+        }
     }
 
 
