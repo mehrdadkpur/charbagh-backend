@@ -25,7 +25,13 @@ namespace Charbagh.Application.LessonSessions.Update
                 throw new LessonSessionNotFoundException(request.Id);
             }
 
-            var sessionExists = await _sessionRepository.ExistsByLessonAssignmentAndDateAsync(\n                request.LessonAssignmentId, request.SessionDate, request.Id, cancellationToken);\n\n            if (sessionExists)\n                throw new DuplicateLessonSessionException(request.LessonAssignmentId, request.SessionDate);\n\n            lessonSession.Update(
+            var sessionExists = await _sessionRepository.ExistsByLessonAssignmentAndDateAsync(
+                lessonSession.LessonAssignmentId, request.SessionDate, request.Id, cancellationToken);
+
+            if (sessionExists)
+                throw new DuplicateLessonSessionException(lessonSession.LessonAssignmentId, request.SessionDate);
+
+            lessonSession.Update(
                 request.SessionDate,
                 request.StartTime,
                 request.EndTime,
