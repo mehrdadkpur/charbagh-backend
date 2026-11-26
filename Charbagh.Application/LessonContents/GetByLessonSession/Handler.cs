@@ -1,12 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Application.LessonContents.Common;
+using MediatR;
 
-namespace Charbagh.Application.LessonContents.GetByLessonSession
+namespace Charbagh.Application.LessonContents.GetByLessonSession;
+
+public sealed class GetLessonContentsBySessionHandler
+    : IRequestHandler<GetLessonContentsBySessionQuery, IReadOnlyList<LessonContentDto>>
 {
-    internal class Handler
+    private readonly ILessonContentRepository _repository;
+
+    public GetLessonContentsBySessionHandler(ILessonContentRepository repository)
     {
+        _repository = repository;
+    }
+
+    public async Task<IReadOnlyList<LessonContentDto>> Handle(
+        GetLessonContentsBySessionQuery request,
+        CancellationToken cancellationToken)
+    {
+        var contents = await _repository.GetByLessonSessionIdAsync(request.LessonSessionId, cancellationToken);
+        return contents.Select(item => item.ToDto()).ToList();
     }
 }
