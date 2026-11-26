@@ -6,6 +6,8 @@ using Charbagh.Application.Categories.GetById;
 using Charbagh.Application.Categories.Activate;
 using Charbagh.Application.Categories.Deactivate;
 using Charbagh.Application.Categories.Update;
+using Charbagh.Api.Authorization;
+using Charbagh.Domain.Enums;
 
 namespace Charbagh.Api.Controllers;
 
@@ -21,6 +23,7 @@ public sealed class CategoriesController : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission("Categories", PermissionAction.Create)]
     public async Task<IActionResult> Create( CreateCategoryCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
@@ -45,6 +48,7 @@ public sealed class CategoriesController : ControllerBase
         }
 
     [HttpPatch("{id:guid}/activate")]
+    [HasPermission("Categories", PermissionAction.Manage)]
     public async Task<IActionResult> Activate(Guid id , CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new ActivateCategoryCommand(id), cancellationToken);
@@ -53,6 +57,7 @@ public sealed class CategoriesController : ControllerBase
 
 
     [HttpPatch("{id:guid}/deactivate")]
+    [HasPermission("Categories", PermissionAction.Manage)]
     public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new DeactivateCategoryCommand(id), cancellationToken);
@@ -60,6 +65,7 @@ public sealed class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [HasPermission("Categories", PermissionAction.Update)]
     public async Task<IActionResult> Update(Guid id,UpdateCategoryCommand command, CancellationToken cancellationToken)
     {
         if (id != command.Id)
