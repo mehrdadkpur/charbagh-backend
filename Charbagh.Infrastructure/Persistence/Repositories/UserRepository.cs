@@ -64,6 +64,17 @@ public sealed class UserRepository : IUserRepository
             .FirstOrDefaultAsync(user => user.Mobile == mobile, cancellationToken);
     }
 
+    public Task<string?> GetSecurityStampByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        return _context.Users
+            .AsNoTracking()
+            .Where(user => user.Id == id)
+            .Select(user => user.SecurityStamp)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<bool> ExistsNationalIdentificationNumberAsync(string nationalIdentificationNumber, Guid? excludeUserId, CancellationToken cancellationToken)
     {
         return await _context.Users.AnyAsync(
