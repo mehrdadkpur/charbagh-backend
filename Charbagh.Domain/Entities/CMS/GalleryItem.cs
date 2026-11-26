@@ -88,11 +88,16 @@ public sealed class GalleryItem : BaseEntity
     public void Update(
         string? title,
         string? description,
-        string? thumbnailUrl)
+        string? thumbnailUrl,
+        string fileUrl)
     {
+        if (string.IsNullOrWhiteSpace(fileUrl))
+            throw new ArgumentException("File URL is required.", nameof(fileUrl));
+
         Title = title?.Trim();
         Description = description?.Trim();
         ThumbnailUrl = thumbnailUrl?.Trim();
+        FileUrl = fileUrl.Trim();
 
         MarkAsUpdated();
     }
