@@ -89,6 +89,9 @@ public sealed class LessonAssignment : BaseEntity
     {
         ValidateIds(studentId, bookId, teacherId, instrumentId);
 
+        if (!Enum.IsDefined(typeof(PaymentPlanType), paymentPlan))
+            throw new ArgumentOutOfRangeException(nameof(paymentPlan), "Payment plan is invalid.");
+
         if (sessionFee < 0)
         {
             throw new ArgumentException(
@@ -119,6 +122,11 @@ public sealed class LessonAssignment : BaseEntity
         PaymentPlanType paymentPlan,
         string? notes)
     {
+        if (!Enum.IsDefined(typeof(PaymentPlanType), paymentPlan))
+        {
+            throw new ArgumentOutOfRangeException(nameof(paymentPlan), "Payment plan is invalid.");
+        }
+
         if (teacherId == Guid.Empty)
         {
             throw new ArgumentException(
