@@ -29,7 +29,13 @@ namespace Charbagh.Application.LessonSessions.Create
                 throw new LessonAssignmentNotFoundException(request.LessonAssignmentId);
             }
 
-            var sessionExists = await _sessionRepository.ExistsByLessonAssignmentAndDateAsync(\n                request.LessonAssignmentId, request.SessionDate, null, cancellationToken);\n\n            if (sessionExists)\n                throw new DuplicateLessonSessionException(request.LessonAssignmentId, request.SessionDate);\n\n            var lessonSession = LessonSession.Create(
+            var sessionExists = await _sessionRepository.ExistsByLessonAssignmentAndDateAsync(
+                request.LessonAssignmentId, request.SessionDate, null, cancellationToken);
+
+            if (sessionExists)
+                throw new DuplicateLessonSessionException(request.LessonAssignmentId, request.SessionDate);
+
+            var lessonSession = LessonSession.Create(
                 request.LessonAssignmentId,
                 request.SessionDate,
                 request.StartTime,
