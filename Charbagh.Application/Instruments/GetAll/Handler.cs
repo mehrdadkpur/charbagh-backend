@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Charbagh.Application.Instruments.GetAll;
 
-public sealed class GetAllInstrumentsHandler : IRequestHandler<GetAllUserssQuery,IReadOnlyList<InstrumentDto>>
+public sealed class GetAllInstrumentsHandler : IRequestHandler<GetAllInstrumentsQuery,IReadOnlyList<InstrumentDto>>
 {
     private readonly IInstrumentRepository _repository;
 
