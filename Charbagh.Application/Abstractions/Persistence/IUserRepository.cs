@@ -10,6 +10,7 @@ public interface IUserRepository
     Task<List<User>> GetAllAsync(CancellationToken cancellationToken);
     Task<User?> GetByNationalIdentificationNumberAsync(string nationalIdentificationNumber, CancellationToken cancellationToken);
     Task<User?> GetByMobileAsync(string mobile, CancellationToken cancellationToken);
+    Task<string?> GetSecurityStampByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<bool> ExistsNationalIdentificationNumberAsync(string nationalIdentificationNumber, Guid? excludeUserId, CancellationToken cancellationToken);
     Task<bool> ExistsNationalityIdAsync(Guid nationalityId, CancellationToken cancellationToken);
     Task<bool> ExistsByUserIdAsync(Guid id, CancellationToken cancellationToken);
