@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Charbagh.Application.LessonContents.Create;
 using Charbagh.Application.LessonContents.GetById;
-using Charbagh.Application.LessonContents.GetAll;
+using Charbagh.Application.LessonContents.GetAll;\nusing Charbagh.Application.LessonContents.GetByLessonSession;
 using Charbagh.Application.LessonContents.SetTeaching;
 using Charbagh.Application.LessonContents.SetPractice;
 using Charbagh.Application.LessonContents.SetPerformance;
@@ -35,6 +35,13 @@ public sealed class LessonContentsController : ControllerBase
     {
         var result =await _mediator.Send(new GetAllLessonContentsQuery(), cancellationToken);
 
+        return Ok(result);
+    }
+
+    [HttpGet("session/{lessonSessionId:guid}")]
+    public async Task<IActionResult> GetByLessonSession(Guid lessonSessionId, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetLessonContentsBySessionQuery(lessonSessionId), cancellationToken);
         return Ok(result);
     }
 
