@@ -27,7 +27,12 @@ namespace Charbagh.Infrastructure.Persistence.Repositories
 
         public async Task<GalleryItem?> GetByIdAsync(Guid Id, CancellationToken cancellationToken)
         {
-            return await _context.GalleryItems.FirstOrDefaultAsync(x => x.Id == Id , cancellationToken);
+            return await _context.GalleryItems.FirstOrDefaultAsync(x => x.Id == Id, cancellationToken);
+        }
+
+        public void Remove(GalleryItem galleryItem)
+        {
+            _context.GalleryItems.Remove(galleryItem);
         }
 
     }
