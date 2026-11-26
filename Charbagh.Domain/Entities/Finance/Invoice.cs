@@ -288,6 +288,41 @@ public sealed class Invoice : BaseEntity
     }
 
 
+    public void UpdatePaymentAmount(decimal previousAmount, decimal newAmount)
+    {
+        if (Status == InvoiceStatus.Draft ||
+            Status == InvoiceStatus.Cancelled)
+        {
+            throw new InvalidOperationException(
+                "Draft or cancelled invoices cannot change payment amounts.");
+        }
+
+        if (previousAmount <= 0 || newAmount <= 0)
+        {
+            throw new ArgumentException(
+                "Payment amounts must be greater than zero.");
+        }
+
+        if (previousAmount > PaidAmount)
+        {
+            throw new InvalidOperationException(
+                "Previous payment amount exceeds the invoice paid amount.");
+        }
+
+        var adjustedPaidAmount = PaidAmount - previousAmount + newAmount;
+
+        if (adjustedPaidAmount > TotalAmount)
+        {
+            throw new InvalidOperationException(
+                "Updated payment amount cannot exceed the invoice total amount.");
+        }
+
+        PaidAmount = adjustedPaidAmount;
+        UpdatePaymentStatus();
+        MarkAsUpdated();
+    }
+
+
     public void RefundPayment(decimal amount)
     {
         if (Status == InvoiceStatus.Draft ||
