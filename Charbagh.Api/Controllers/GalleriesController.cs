@@ -8,6 +8,8 @@ using Charbagh.Application.Galleries.Restore;
 using Charbagh.Application.Galleries.SetPublish;
 using Charbagh.Application.Galleries.SetUnpublish;
 using Charbagh.Application.Galleries.Update;
+using Charbagh.Api.Authorization;
+using Charbagh.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +27,7 @@ public class GalleriesController : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission("Galleries", PermissionAction.Create)]
     public async Task<IActionResult> Create( CreateGalleryCommand command,CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
@@ -36,6 +39,7 @@ public class GalleriesController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [HasPermission("Galleries", PermissionAction.View)]
     public async Task<IActionResult> GetById( Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetGalleryByIdQuery(id),cancellationToken);
@@ -43,6 +47,7 @@ public class GalleriesController : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission("Galleries", PermissionAction.View)]
     public async Task<IActionResult> GetAll( CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetAllGalleriesQuery(), cancellationToken);
@@ -50,6 +55,7 @@ public class GalleriesController : ControllerBase
     }
 
     [HttpGet("status/{status}")]
+    [HasPermission("Galleries", PermissionAction.View)]
     public async Task<IActionResult> GetByStatus(GalleryStatus status,CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetByStatusGalleriesQuery(status), cancellationToken);
@@ -57,6 +63,7 @@ public class GalleriesController : ControllerBase
     }
 
     [HttpGet("title/{title}")]
+    [HasPermission("Galleries", PermissionAction.View)]
     public async Task<IActionResult> GetByTitle(string title, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetByTitleGalleriesQuery(title), cancellationToken);
@@ -64,6 +71,7 @@ public class GalleriesController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [HasPermission("Galleries", PermissionAction.Update)]
     public async Task<IActionResult> Update( Guid id, UpdateGalleryCommand command, CancellationToken cancellationToken)
     {
         if (id != command.Id)
@@ -75,6 +83,7 @@ public class GalleriesController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/archive")]
+    [HasPermission("Galleries", PermissionAction.Delete)]
     public async Task<IActionResult> Archive( Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send( new ArchiveGalleryCommand(id), cancellationToken);
@@ -83,6 +92,7 @@ public class GalleriesController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/publish")]
+    [HasPermission("Galleries", PermissionAction.Approve)]
     public async Task<IActionResult> SetPublish( Guid id,CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new SetPublishGalleryCommand(id), cancellationToken);
@@ -91,6 +101,7 @@ public class GalleriesController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/restore")]
+    [HasPermission("Galleries", PermissionAction.Update)]
     public async Task<IActionResult> Restore(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new RestoreGalleryCommand(id), cancellationToken);
@@ -99,6 +110,7 @@ public class GalleriesController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/unpublish")]
+    [HasPermission("Galleries", PermissionAction.Approve)]
     public async Task<IActionResult> SetUnpublish(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new SetUnpublishGalleryCommand(id), cancellationToken);
