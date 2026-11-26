@@ -241,6 +241,19 @@ internal static class PermissionDefinitions
         new("Tags", "tags.update", PermissionAction.Update, "ویرایش برچسب‌ها"),
         new("Tags", "tags.delete", PermissionAction.Delete, "حذف برچسب‌ها"),
 
+        // CMS - Galleries
+        new("Galleries", "galleries.view", PermissionAction.View, "مشاهده گالری‌ها"),
+        new("Galleries", "galleries.create", PermissionAction.Create, "ایجاد گالری"),
+        new("Galleries", "galleries.update", PermissionAction.Update, "ویرایش گالری"),
+        new("Galleries", "galleries.delete", PermissionAction.Delete, "بایگانی گالری"),
+        new("Galleries", "galleries.publish", PermissionAction.Approve, "انتشار گالری"),
+
+        // CMS - Gallery items
+        new("GalleryItems", "gallery-items.view", PermissionAction.View, "مشاهده رسانه‌های گالری"),
+        new("GalleryItems", "gallery-items.create", PermissionAction.Create, "افزودن رسانه به گالری"),
+        new("GalleryItems", "gallery-items.update", PermissionAction.Update, "ویرایش رسانه گالری"),
+        new("GalleryItems", "gallery-items.delete", PermissionAction.Delete, "حذف رسانه گالری"),
+
         // CMS - Generic exports
         new("Reports", "reports.export", PermissionAction.Export, "خروجی گزارش‌ها")
     ];
