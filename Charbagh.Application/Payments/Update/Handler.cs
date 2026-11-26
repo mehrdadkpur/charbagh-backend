@@ -8,7 +8,6 @@ public sealed class UpdatePaymentHandler
     : IRequestHandler<UpdatePaymentCommand, PaymentDto>
 {
     private readonly IPaymentRepository _paymentRepository;
-    private readonly IInvoiceRepository _invoiceRepository;
     private readonly ITransactionRepository _transactionRepository;
     private readonly IPaymentMethodRepository _paymentMethodRepository;
     private readonly IUserRepository _userRepository;
@@ -16,14 +15,12 @@ public sealed class UpdatePaymentHandler
 
     public UpdatePaymentHandler(
         IPaymentRepository paymentRepository,
-        IInvoiceRepository invoiceRepository,
         ITransactionRepository transactionRepository,
         IPaymentMethodRepository paymentMethodRepository,
         IUserRepository userRepository,
         IUnitOfWork unitOfWork)
     {
         _paymentRepository = paymentRepository;
-        _invoiceRepository = invoiceRepository;
         _transactionRepository = transactionRepository;
         _paymentMethodRepository = paymentMethodRepository;
         _userRepository = userRepository;
@@ -52,12 +49,11 @@ public sealed class UpdatePaymentHandler
                 "Payments linked to transactions cannot be edited. Create an adjustment or refund transaction instead.");
         }
 
-        var invoice = await _invoiceRepository.GetForUpdateAsync(
-            payment.InvoiceId,
-            cancellationToken);
-
-        if (invoice is null)
-            throw new KeyNotFoundException("Invoice was not found.");
+        if (request.Amount != payment.Amount)
+        {
+            throw new InvalidOperationException(
+                "Payment amount is immutable. Use a refund or adjustment transaction to correct financial amounts.");
+        }
 
         var paymentMethod = await _paymentMethodRepository.GetByIdAsync(
             request.PaymentMethodId,
@@ -78,8 +74,6 @@ public sealed class UpdatePaymentHandler
             if (user is null)
                 throw new KeyNotFoundException("Paid by user was not found.");
         }
-
-        invoice.UpdatePaymentAmount(payment.Amount, request.Amount);
 
         payment.Update(
             request.PaymentMethodId,
