@@ -1,7 +1,4 @@
-﻿using Charbagh.Application.BookItems.Activate;
-using Charbagh.Application.BookItems.Deactivate;
-using Charbagh.Application.BookItems.Update;
-using Charbagh.Application.TeachingPlans.Activate;
+﻿using Charbagh.Application.TeachingPlans.Activate;
 using Charbagh.Application.TeachingPlans.Cancel;
 using Charbagh.Application.TeachingPlans.Complete;
 using Charbagh.Application.TeachingPlans.Create;
@@ -29,7 +26,7 @@ public sealed class TeachingPlansController : ControllerBase
     {
         var result = await _mediator.Send(command, cancellationToken);
 
-        return CreatedAtAction( nameof(Application.TeachingPlans.GetById), new { id = result.Id }, result);
+        return CreatedAtAction( nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
