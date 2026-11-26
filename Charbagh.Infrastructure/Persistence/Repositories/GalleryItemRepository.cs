@@ -22,7 +22,10 @@ namespace Charbagh.Infrastructure.Persistence.Repositories
 
         public async Task<IReadOnlyList<GalleryItem>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await _context.GalleryItems.AsNoTracking().ToListAsync(cancellationToken) ;
+            return await _context.GalleryItems.AsNoTracking()
+                .OrderBy(x => x.SortOrder)
+                .ThenByDescending(x => x.CreatedAt)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<GalleryItem?> GetByIdAsync(Guid Id, CancellationToken cancellationToken)
