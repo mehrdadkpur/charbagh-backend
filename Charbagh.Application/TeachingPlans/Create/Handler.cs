@@ -48,6 +48,28 @@ namespace Charbagh.Application.TeachingPlans.Create
                 throw new BookNotFoundException(request.BookId);
             }
 
+            if (lessonAssignment.BookId != request.BookId)
+            {
+                throw new InvalidOperationException("Teaching plan book must match the lesson assignment book.");
+            }
+
+            var startBookItem = await _bookItemRepository.GetByIdAsync(request.StartBookItemId, cancellationToken);
+            if (startBookItem is null)
+                throw new BookItemNotFoundException(request.StartBookItemId);
+
+            if (startBookItem.BookId != request.BookId)
+                throw new InvalidOperationException("Start book item does not belong to the selected book.");
+
+            if (request.TargetBookItemId.HasValue)
+            {
+                var targetBookItem = await _bookItemRepository.GetByIdAsync(request.TargetBookItemId.Value, cancellationToken);
+                if (targetBookItem is null)
+                    throw new BookItemNotFoundException(request.TargetBookItemId.Value);
+
+                if (targetBookItem.BookId != request.BookId)
+                    throw new InvalidOperationException("Target book item does not belong to the selected book.");
+            }
+
             // 3. Active TeachingPlan
 
             var existsActiveTeachingPlan =
