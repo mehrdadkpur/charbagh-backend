@@ -27,7 +27,7 @@ public sealed class InvoicesController : ControllerBase
     {
         var result = await _mediator.Send(command, cancellationToken);
 
-        return CreatedAtAction( nameof(Application.Invoices.GetById), new { id = result.Id }, result);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
@@ -46,9 +46,9 @@ public sealed class InvoicesController : ControllerBase
         }
 
     [HttpGet("student/{studentId:guid}")]
-    public async Task<IActionResult> GetByStudentId(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetByStudentId(Guid studentId, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new GetAllInvoicesByStudentIdQuery(id), cancellationToken);
+        var result = await _mediator.Send(new GetAllInvoicesByStudentIdQuery(studentId), cancellationToken);
         return Ok(result);
     }
 
