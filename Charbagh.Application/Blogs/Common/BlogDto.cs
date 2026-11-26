@@ -8,6 +8,9 @@
         string LastName,
         string Title,
         string Text,
-        string? ImageUrl
+        string? ImageUrl,
+        BlogStatus Status,
+        DateTime CreatedAt,
+        DateTime? UpdatedAt
         );
 }
