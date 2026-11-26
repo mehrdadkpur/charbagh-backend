@@ -8,6 +8,9 @@ using Charbagh.Application.Contacts.MarkAsReplied;
 using Charbagh.Application.Contacts.Reopen;
 using Charbagh.Application.Contacts.StartProcessing;
 using MediatR;
+using Charbagh.Api.Authorization;
+using Charbagh.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Charbagh.Api.Controllers;
@@ -24,6 +27,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Create(
         CreateContactCommand command,
         CancellationToken cancellationToken)
@@ -39,6 +43,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [HasPermission("Contacts", PermissionAction.View)]
     public async Task<IActionResult> GetById(
         Guid id,
         CancellationToken cancellationToken)
@@ -51,6 +56,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission("Contacts", PermissionAction.View)]
     public async Task<IActionResult> GetAll(
         CancellationToken cancellationToken)
     {
@@ -62,6 +68,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpGet("mobile/{mobile}")]
+    [HasPermission("Contacts", PermissionAction.View)]
     public async Task<IActionResult> GetByMobile(
         string mobile,
         CancellationToken cancellationToken)
@@ -74,6 +81,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpGet("status/{status}")]
+    [HasPermission("Contacts", PermissionAction.View)]
     public async Task<IActionResult> GetByStatus(
         ContactStatus status,
         CancellationToken cancellationToken)
@@ -86,6 +94,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/processing")]
+    [HasPermission("Contacts", PermissionAction.Manage)]
     public async Task<IActionResult> StartProcessing(
         Guid id,
         CancellationToken cancellationToken)
@@ -98,6 +107,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/reply")]
+    [HasPermission("Contacts", PermissionAction.Manage)]
     public async Task<IActionResult> MarkAsReplied(
         Guid id,
         CancellationToken cancellationToken)
@@ -110,6 +120,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/close")]
+    [HasPermission("Contacts", PermissionAction.Manage)]
     public async Task<IActionResult> Close(
         Guid id,
         CancellationToken cancellationToken)
@@ -122,6 +133,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/reopen")]
+    [HasPermission("Contacts", PermissionAction.Manage)]
     public async Task<IActionResult> Reopen(
         Guid id,
         CancellationToken cancellationToken)
