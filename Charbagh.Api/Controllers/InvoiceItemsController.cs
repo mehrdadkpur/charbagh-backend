@@ -41,7 +41,7 @@ public sealed class InvoiceItemsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll ( CancellationToken cancellationToken)
     {
-        var result =await _mediator.Send(new GetAllInvoiceItemsQuery(), cancellationToken);
+        var result =await _sender.Send(new GetAllInvoiceItemsQuery(), cancellationToken);
 
         return Ok(result);
     }
@@ -49,7 +49,7 @@ public sealed class InvoiceItemsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id , CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new GetInvoiceItemByIdQuery(id), cancellationToken);
+            var result = await _sender.Send(new GetInvoiceItemByIdQuery(id), cancellationToken);
             return Ok(result);
         }
 
@@ -67,7 +67,7 @@ public sealed class InvoiceItemsController : ControllerBase
         {
             return BadRequest();
         }
-        var result =await _mediator.Send( command, cancellationToken);
+        var result =await _sender.Send( command, cancellationToken);
         return Ok(result);
     }
 }
