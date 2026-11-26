@@ -51,7 +51,8 @@ namespace Charbagh.Domain.Entities.Education.StudentEducation
             string? fromReference,
             string? toReference,
             string? instruction,
-            DateOnly? dueDate
+            DateOnly? dueDate,
+            PracticePriority priority
             )
         {
             if (lessonSessionId == Guid.Empty)
@@ -68,7 +69,7 @@ namespace Charbagh.Domain.Entities.Education.StudentEducation
                 toReference, 
                 instruction,
                 dueDate,
-                priority: PracticePriority.Normal
+                priority
 
                 );
             practiceAssignment.MarkAsCreated();
