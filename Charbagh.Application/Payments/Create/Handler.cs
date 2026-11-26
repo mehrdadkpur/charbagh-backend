@@ -103,8 +103,6 @@ public sealed class CreatePaymentHandler : IRequestHandler<CreatePaymentCommand,
             payment,
             cancellationToken);
 
-        invoice.AddPayment(request.Amount);
-
         await _unitOfWork.SaveChangesAsync(
             cancellationToken);
 
