@@ -75,6 +75,16 @@ public sealed class RefreshTokenRepository : IRefreshTokenRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<RefreshToken>> GetByUserIdForUpdateAsync(
+        Guid userId,
+        CancellationToken cancellationToken)
+    {
+        return await _context.RefreshTokens
+            .Where(x => x.UserId == userId)
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<RefreshToken>> GetByIPAddressAsync(
         string ipAddress,
         CancellationToken cancellationToken)
