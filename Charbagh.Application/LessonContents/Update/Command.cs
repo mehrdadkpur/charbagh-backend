@@ -6,7 +6,6 @@ namespace Charbagh.Application.LessonContents.Update
 {
     public sealed record UpdateLessonContentCommand(
         Guid Id,
-        Guid LessonSessionId,
         Guid BookItemId,
         string? FromReference,
         string? ToReference,
