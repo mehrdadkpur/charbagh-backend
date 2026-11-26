@@ -37,11 +37,13 @@ public sealed class Blog : BaseEntity
 
     private Blog(
         Guid userId,
+        Guid categoryId,
         string title,
         string text,
         string? imageUrl)
     {
         UserId = userId;
+        CategoryId = categoryId;
         Title = title;
         Text = text;
         ImageUrl = imageUrl;
@@ -53,6 +55,7 @@ public sealed class Blog : BaseEntity
 
     public static Blog Create(
         Guid userId,
+        Guid categoryId,
         string title,
         string text,
         string? imageUrl = null)
@@ -62,6 +65,13 @@ public sealed class Blog : BaseEntity
             throw new ArgumentException(
                 "Author is required.",
                 nameof(userId));
+        }
+
+        if (categoryId == Guid.Empty)
+        {
+            throw new ArgumentException(
+                "Blog category is required.",
+                nameof(categoryId));
         }
 
         if (string.IsNullOrWhiteSpace(title))
@@ -80,6 +90,7 @@ public sealed class Blog : BaseEntity
 
         var blog = new Blog(
             userId,
+            categoryId,
             title.Trim(),
             text.Trim(),
             imageUrl?.Trim());
