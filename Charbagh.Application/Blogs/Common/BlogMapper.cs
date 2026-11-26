@@ -15,7 +15,10 @@ namespace Charbagh.Application.Blogs.Common
                 blog.Author.LastName,
                 blog.Title,
                 blog.Text,
-                blog.ImageUrl
+                blog.ImageUrl,
+                blog.Status,
+                blog.CreatedAt,
+                blog.UpdatedAt
                 );
         }
     }
