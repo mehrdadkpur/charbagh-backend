@@ -105,6 +105,9 @@ public class Book : BaseEntity
                 "Book title is required.",
                 nameof(title));
 
+        if (!Enum.IsDefined(typeof(BookLevel), level))
+            throw new ArgumentOutOfRangeException(nameof(level), "Book level is invalid.");
+
         if (volume is not null && volume <= 0)
             throw new ArgumentException(
                 "Volume must be greater than zero.",
