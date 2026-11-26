@@ -80,13 +80,20 @@ public sealed class FinancialReportsController : ControllerBase
             .ToList();
 
         var serviceRevenue = validInvoices
-            .SelectMany(invoice => invoice.Items)
-            .GroupBy(item => item.Description)
+            .SelectMany(invoice => invoice.Items.Select(item => new
+            {
+                serviceName = item.Description,
+                netAmount = invoice.Subtotal > 0
+                    ? item.TotalAmount - (item.TotalAmount / invoice.Subtotal * invoice.DiscountAmount)
+                    : item.TotalAmount,
+                quantity = item.Quantity
+            }))
+            .GroupBy(item => item.serviceName)
             .Select(group => new
             {
                 serviceName = group.Key,
-                amount = group.Sum(item => item.TotalAmount),
-                quantity = group.Sum(item => item.Quantity)
+                amount = Math.Round(group.Sum(item => item.netAmount), 2),
+                quantity = group.Sum(item => item.quantity)
             })
             .OrderByDescending(x => x.amount)
             .ToList();
