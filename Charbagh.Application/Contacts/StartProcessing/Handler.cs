@@ -26,6 +26,7 @@ namespace Charbagh.Application.Contacts.StartProcessing
             }
 
             contact.StartProcessing();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return contact.ToDto();
         }
