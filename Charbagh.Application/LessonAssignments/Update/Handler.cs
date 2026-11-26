@@ -27,11 +27,20 @@ namespace Charbagh.Application.LessonAssignments.Update
                 throw new LessonAssignmentNotFoundException(request.Id);
             }
 
-            var existsActiveAssignment = await _lessonAssignmentrepository.ExistsActiveAssignmentAsync(lessonAssignment.StudentId, lessonAssignment.InstrumentId, request.Id, cancellationToken);
-
-            if (existsActiveAssignment)
+            if (lessonAssignment.IsActive)
             {
-                throw new DuplicateLessonAssignmentException(lessonAssignment.StudentId, lessonAssignment.InstrumentId);
+                var existsActiveAssignment = await _lessonAssignmentrepository.ExistsActiveAssignmentAsync(
+                    lessonAssignment.StudentId,
+                    lessonAssignment.InstrumentId,
+                    request.Id,
+                    cancellationToken);
+
+                if (existsActiveAssignment)
+                {
+                    throw new DuplicateLessonAssignmentException(
+                        lessonAssignment.StudentId,
+                        lessonAssignment.InstrumentId);
+                }
             }
 
             lessonAssignment.Update(request.TeacherId , request.BookId , request.SessionFee , request.PaymentPlan , request.Notes);
