@@ -14,6 +14,8 @@ namespace Charbagh.Application.Abstractions.Persistence
 
         Task<IReadOnlyList<RefreshToken>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken);
 
+        Task<IReadOnlyList<RefreshToken>> GetByUserIdForUpdateAsync(Guid userId, CancellationToken cancellationToken);
+
         Task<IReadOnlyList<RefreshToken>> GetByIPAddressAsync(string ipAddress, CancellationToken cancellationToken);
     }
 }
