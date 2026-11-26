@@ -61,6 +61,13 @@ public sealed class Transaction : BaseEntity
         ValidateIds(paymentId, createdByUserId);
         ValidateAmount(amount);
 
+        if (!Enum.IsDefined(typeof(TransactionType), type))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(type),
+                "Transaction type is invalid.");
+        }
+
         var transaction = new Transaction(
             paymentId,
             createdByUserId,
