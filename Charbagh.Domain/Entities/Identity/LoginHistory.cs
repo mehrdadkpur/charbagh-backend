@@ -23,13 +23,13 @@ public sealed class LoginHistory : BaseEntity
     {
         Id = Guid.NewGuid();
         UserId = userId;
-        AttemptedMobile = attemptedMobile.Trim();
+        AttemptedMobile = Limit(attemptedMobile, 20)!;
         LoginAt = DateTime.UtcNow;
         IsSuccessful = isSuccessful;
-        FailureReason = failureReason?.Trim();
-        IpAddress = ipAddress?.Trim();
-        UserAgent = userAgent?.Trim();
-        DeviceName = deviceName?.Trim();
+        FailureReason = Limit(failureReason, 500);
+        IpAddress = Limit(ipAddress, 45);
+        UserAgent = Limit(userAgent, 500);
+        DeviceName = Limit(deviceName, 200);
     }
 
     public static LoginHistory Create(
@@ -48,6 +48,13 @@ public sealed class LoginHistory : BaseEntity
             failureReason, ipAddress, userAgent, deviceName);
         history.MarkAsCreated();
         return history;
+    }
+
+    private static string? Limit(string? value, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return null;
+        var normalized = value.Trim();
+        return normalized.Length <= maxLength ? normalized : normalized[..maxLength];
     }
 
     public void RecordLogout()
