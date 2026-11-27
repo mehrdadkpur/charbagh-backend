@@ -50,6 +50,8 @@ public partial class CompleteLoginAudit : Migration
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
+        migrationBuilder.Sql("DELETE FROM [LoginHistories] WHERE [UserId] IS NULL;");
+
         migrationBuilder.DropForeignKey(
             name: "FK_RefreshTokens_LoginHistories_LoginHistoryId",
             table: "RefreshTokens");
