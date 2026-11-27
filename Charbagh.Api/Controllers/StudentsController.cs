@@ -9,11 +9,14 @@ using Charbagh.Application.Students.Block;
 using Charbagh.Application.Students.Suspend;
 using Charbagh.Application.Students.Unblock;
 using Charbagh.Api.Authorization;
+using Charbagh.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Charbagh.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class StudentsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -33,6 +36,7 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission("Students", PermissionAction.View)]
     public async Task<IActionResult> GetAll ( CancellationToken cancellationToken)
     {
         var result =await _mediator.Send(new GetAllStudentsQuery(), cancellationToken);
@@ -41,6 +45,7 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [HasPermission("Students", PermissionAction.View)]
     public async Task<IActionResult> GetById(Guid id , CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetStudentByIdQuery(id), cancellationToken);
@@ -49,6 +54,7 @@ public sealed class StudentsController : ControllerBase
         }
 
     [HttpPatch("{id:guid}/activate")]
+    [HasPermission("Students", PermissionAction.Manage)]
     public async Task<IActionResult> Activate(Guid id , CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new ActivateStudentCommand(id), cancellationToken);
@@ -56,6 +62,7 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/suspend")]
+    [HasPermission("Students", PermissionAction.Manage)]
     public async Task<IActionResult> Suspend(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new SuspendStudentCommand(id), cancellationToken);
@@ -63,6 +70,7 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/block")]
+    [HasPermission("Students", PermissionAction.Manage)]
     public async Task<IActionResult> Block(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new BlockStudentCommand(id), cancellationToken);
@@ -70,6 +78,7 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/unblock")]
+    [HasPermission("Students", PermissionAction.Manage)]
     public async Task<IActionResult> Unblock(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new UnblockStudentCommand(id), cancellationToken);
@@ -77,6 +86,7 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [HasPermission("Students", PermissionAction.Update)]
     public async Task<IActionResult> Update(Guid id,UpdateStudentCommand command, CancellationToken cancellationToken)
     {
         if (id != command.Id)
