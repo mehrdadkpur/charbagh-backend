@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using Charbagh.Api.Authorization;
+using Charbagh.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Charbagh.Application.StudentParents.Create;
 using Charbagh.Application.StudentParents.GetByParentId;
@@ -12,6 +15,7 @@ namespace Charbagh.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class StudentParentsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -22,7 +26,7 @@ public sealed class StudentParentsController : ControllerBase
     }
 
     [HttpPost]
-    [HasPermission("Parents", PermissionAction.Create)]
+    [HasPermission("StudentParents", PermissionAction.Create)]
     public async Task<IActionResult> Create(CreateStudentParentCommand command, CancellationToken cancellationToken)
     {
         try
@@ -51,7 +55,7 @@ public sealed class StudentParentsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    [HasPermission("Parents", PermissionAction.View)]
+    [HasPermission("StudentParents", PermissionAction.View)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetStudentParentByIdQuery(id), cancellationToken);
@@ -59,6 +63,7 @@ public sealed class StudentParentsController : ControllerBase
     }
 
     [HttpGet("parent/{parentId:guid}")]
+    [HasPermission("StudentParents", PermissionAction.View)]
     public async Task<IActionResult> GetByParentId(Guid parentId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetStudentParentByParentIdQuery(parentId), cancellationToken);
@@ -66,6 +71,7 @@ public sealed class StudentParentsController : ControllerBase
     }
 
     [HttpGet("student/{studentId:guid}")]
+    [HasPermission("StudentParents", PermissionAction.View)]
     public async Task<IActionResult> GetByStudentId(Guid studentId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetStudentParentByStudentIdQuery(studentId), cancellationToken);
@@ -73,6 +79,7 @@ public sealed class StudentParentsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [HasPermission("StudentParents", PermissionAction.Update)]
     public async Task<IActionResult> UpdateRelationShip(Guid id, UpdateStudentParentRelationCommand command, CancellationToken cancellationToken)
     {
         if (id != command.Id)
@@ -95,6 +102,7 @@ public sealed class StudentParentsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [HasPermission("StudentParents", PermissionAction.Delete)]
     public async Task<IActionResult> RemoveStudentParent(Guid id, CancellationToken cancellationToken)
     {
         await _mediator.Send(new RemoveStudentParentCommand(id), cancellationToken);
