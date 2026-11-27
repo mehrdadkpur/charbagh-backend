@@ -5,6 +5,8 @@ using Charbagh.Infrastructure.DependencyInjection;
 using Charbagh.Infrastructure.Security;
 using Charbagh.Infrastructure.Setup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -82,6 +84,16 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.Configure<JwtSettings>(
 builder.Configuration.GetSection("Jwt"));
 builder.Services.AddHttpContextAccessor();
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    var knownProxies = builder.Configuration.GetSection("ForwardedHeaders:KnownProxies").Get<string[]>() ?? Array.Empty<string>();
+    foreach (var proxy in knownProxies)
+    {
+        if (IPAddress.TryParse(proxy, out var address))
+            options.KnownProxies.Add(address);
+    }
+});
 
 builder.Services.AddSingleton(jwtSettings);
 builder.Services.AddSingleton<IAuthorizationPolicyProvider,PermissionPolicyProvider>();
@@ -183,6 +195,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
