@@ -5,6 +5,8 @@ using Charbagh.Application.Authentication.Login;
 using Charbagh.Domain.Entities.Identity;
 using MediatR;
 
+namespace Charbagh.Application.Authentication.Login;
+
 public sealed class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
 {
     private const string InvalidCredentials = "Invalid mobile number or password.";
