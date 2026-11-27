@@ -4,6 +4,8 @@ public sealed class RefreshToken : BaseEntity
 {
     public Guid UserId { get; private set; }
 
+    public Guid? LoginHistoryId { get; private set; }
+
     public string Token { get; private set; } = null!;
 
     public DateTime ExpiresAt { get; private set; }
@@ -36,7 +38,8 @@ public sealed class RefreshToken : BaseEntity
         DateTime expiresAt,
         string? ipAddress,
         string? userAgent,
-        string? deviceName)
+        string? deviceName,
+        Guid? loginHistoryId)
     {
         UserId = userId;
         Token = token;
@@ -44,6 +47,7 @@ public sealed class RefreshToken : BaseEntity
         IpAddress = ipAddress;
         UserAgent = userAgent;
         DeviceName = deviceName;
+        LoginHistoryId = loginHistoryId;
     }
 
     public static RefreshToken Create(
@@ -52,7 +56,8 @@ public sealed class RefreshToken : BaseEntity
         DateTime expiresAt,
         string? ipAddress = null,
         string? userAgent = null,
-        string? deviceName = null)
+        string? deviceName = null,
+        Guid? loginHistoryId = null)
     {
         if (userId == Guid.Empty)
             throw new ArgumentException(
@@ -75,7 +80,8 @@ public sealed class RefreshToken : BaseEntity
             expiresAt,
             ipAddress?.Trim(),
             userAgent?.Trim(),
-            deviceName?.Trim());
+            deviceName?.Trim(),
+            loginHistoryId);
 
         refreshToken.MarkAsCreated();
 
