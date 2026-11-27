@@ -93,7 +93,11 @@ public sealed class RefreshTokenHandler
             Charbagh.Domain.Entities.Identity.RefreshToken.Create(
                 user.Id,
                 newRefreshTokenValue,
-                newRefreshTokenExpiresAt);
+                newRefreshTokenExpiresAt,
+                currentRefreshToken.IpAddress,
+                currentRefreshToken.UserAgent,
+                currentRefreshToken.DeviceName,
+                currentRefreshToken.LoginHistoryId);
 
         currentRefreshToken.Replace(
             newRefreshTokenValue);
