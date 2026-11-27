@@ -26,6 +26,7 @@ public sealed class PermissionChecker : IPermissionChecker
             .AnyAsync(
                 userBranchRole =>
                     userBranchRole.UserBranch.UserId == userId &&
+                    userBranchRole.UserBranch.User.Status == UserStatus.Active &&
                     userBranchRole.UserBranch.BranchId == branchId &&
                     userBranchRole.UserBranch.IsActive &&
                     userBranchRole.UserBranch.Branch.IsActive &&
