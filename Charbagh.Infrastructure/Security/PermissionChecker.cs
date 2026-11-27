@@ -1,4 +1,4 @@
-﻿using Charbagh.Application.Abstractions.Security;
+using Charbagh.Application.Abstractions.Security;
 using Charbagh.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +11,27 @@ public sealed class PermissionChecker : IPermissionChecker
     public PermissionChecker(CharbaghDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<bool> HasAnyActiveRoleAsync(
+        Guid userId,
+        Guid branchId,
+        CancellationToken cancellationToken)
+    {
+        if (userId == Guid.Empty || branchId == Guid.Empty)
+            return false;
+
+        return await _context.UserBranchRoles
+            .AsNoTracking()
+            .AnyAsync(
+                userBranchRole =>
+                    userBranchRole.UserBranch.UserId == userId &&
+                    userBranchRole.UserBranch.BranchId == branchId &&
+                    userBranchRole.UserBranch.IsActive &&
+                    userBranchRole.UserBranch.Branch.IsActive &&
+                    userBranchRole.IsActive &&
+                    userBranchRole.Role.IsActive,
+                cancellationToken);
     }
 
     public async Task<bool> HasPermissionAsync(
