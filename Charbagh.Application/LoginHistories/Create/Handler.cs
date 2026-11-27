@@ -22,6 +22,7 @@ public sealed class CreateLoginHistoryHandler: IRequestHandler<CreateLoginHistor
     {
         var loginHistory = LoginHistory.Create(
             request.UserId,
+            request.AttemptedMobile,
             request.IsSuccessful,
             request.FailureReason,
             request.IpAddress,
