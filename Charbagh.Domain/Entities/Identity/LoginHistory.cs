@@ -21,6 +21,7 @@ public sealed class LoginHistory : BaseEntity
         Guid? userId, string attemptedMobile, bool isSuccessful,
         string? failureReason, string? ipAddress, string? userAgent, string? deviceName)
     {
+        Id = Guid.NewGuid();
         UserId = userId;
         AttemptedMobile = attemptedMobile.Trim();
         LoginAt = DateTime.UtcNow;
