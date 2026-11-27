@@ -30,6 +30,7 @@ public sealed class LoginHistoryRepository
     {
         return await _context.LoginHistories
             .AsNoTracking()
+            .Include(x => x.User)
             .FirstOrDefaultAsync(
                 x => x.Id == id,
                 cancellationToken);
@@ -40,6 +41,7 @@ public sealed class LoginHistoryRepository
     {
         return await _context.LoginHistories
             .AsNoTracking()
+            .Include(x => x.User)
             .OrderByDescending(x => x.LoginAt)
             .ToListAsync(cancellationToken);
     }
@@ -50,6 +52,7 @@ public sealed class LoginHistoryRepository
     {
         return await _context.LoginHistories
             .AsNoTracking()
+            .Include(x => x.User)
             .Where(x => x.UserId == userId)
             .OrderByDescending(x => x.LoginAt)
             .ToListAsync(cancellationToken);

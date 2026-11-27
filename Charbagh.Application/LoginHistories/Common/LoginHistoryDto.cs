@@ -2,7 +2,9 @@
 
 public sealed record LoginHistoryDto(
     Guid Id,
-    Guid UserId,
+    Guid? UserId,
+    string? UserFullName,
+    string Mobile,
     DateTime LoginAt,
     DateTime? LogoutAt,
     bool IsSuccessful,

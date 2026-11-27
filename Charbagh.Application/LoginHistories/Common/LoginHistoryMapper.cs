@@ -11,6 +11,8 @@ public static class LoginHistoryMapper
         return new LoginHistoryDto(
             loginHistory.Id,
             loginHistory.UserId,
+            loginHistory.User?.FullName,
+            loginHistory.User?.Mobile ?? loginHistory.AttemptedMobile,
             loginHistory.LoginAt,
             loginHistory.LogoutAt,
             loginHistory.IsSuccessful,

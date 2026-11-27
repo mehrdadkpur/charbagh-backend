@@ -13,6 +13,10 @@ public sealed class LoginHistoryConfiguration
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.AttemptedMobile)
+            .IsRequired()
+            .HasMaxLength(20);
+
         builder.Property(x => x.LoginAt)
             .IsRequired();
 
@@ -34,7 +38,8 @@ public sealed class LoginHistoryConfiguration
         builder.HasOne(x => x.User)
             .WithMany(x => x.LoginHistories)
             .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
 
         builder.HasIndex(x => x.UserId);
 

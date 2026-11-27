@@ -1,9 +1,14 @@
+using Charbagh.Api.Authorization;
 using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Charbagh.Api.Controllers;
 
 [ApiController]
+[Authorize]
+[HasPermission("Reports", PermissionAction.View)]
 [Route("api/[controller]")]
 public sealed class FinancialReportsController : ControllerBase
 {
