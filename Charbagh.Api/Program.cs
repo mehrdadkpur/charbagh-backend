@@ -1,4 +1,4 @@
-﻿using Charbagh.Api.Authorization;
+using Charbagh.Api.Authorization;
 using Charbagh.Application;
 using Charbagh.Application.Abstractions.Security;
 using Charbagh.Infrastructure.DependencyInjection;
@@ -140,9 +140,10 @@ builder.Services
                 var userRepository = context.HttpContext.RequestServices
                     .GetRequiredService<IUserRepository>();
 
+                var cancellationToken = context.HttpContext.RequestAborted;
                 var currentStamp = await userRepository.GetSecurityStampByIdAsync(
                     userId,
-                    context.HttpContext.RequestAborted);
+                    cancellationToken);
 
                 if (!string.Equals(
                     currentStamp,
@@ -150,6 +151,34 @@ builder.Services
                     StringComparison.Ordinal))
                 {
                     context.Fail("This session is no longer valid. Please sign in again.");
+                    return;
+                }
+
+                var user = await userRepository.GetByIdAsync(userId, cancellationToken);
+                if (user is null || user.Status != UserStatus.Active)
+                {
+                    context.Fail("This user account is not active.");
+                    return;
+                }
+
+                var branchIdValue = context.Principal?
+                    .FindFirst("branch_id")?.Value;
+
+                if (!Guid.TryParse(branchIdValue, out var branchId))
+                {
+                    context.Fail("Invalid branch in authentication token.");
+                    return;
+                }
+
+                var permissionChecker = context.HttpContext.RequestServices
+                    .GetRequiredService<IPermissionChecker>();
+
+                var hasActiveRole = await permissionChecker.HasAnyActiveRoleAsync(
+                    userId, branchId, cancellationToken);
+
+                if (!hasActiveRole)
+                {
+                    context.Fail("No active role is assigned to this user in the selected branch.");
                 }
             }
         };
