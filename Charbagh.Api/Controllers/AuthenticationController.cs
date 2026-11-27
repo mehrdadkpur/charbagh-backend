@@ -36,6 +36,8 @@ public sealed class AuthenticationController : ControllerBase
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
         var userAgent = Request.Headers["User-Agent"].ToString();
+        if (userAgent.Length > 500)
+            userAgent = userAgent[..500];
 
         var result = await _sender.Send(
             command with { IpAddress = ipAddress, UserAgent = userAgent },
