@@ -1,4 +1,4 @@
-﻿using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Domain.Entities.Identity;
 using Charbagh.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -61,7 +61,9 @@ namespace Charbagh.Infrastructure.Persistence.Repositories
 
         public async Task<UserBranch?> GetDefaultByUserIdAsync(Guid userId, CancellationToken cancellationToken)
         {
-            return await _context.UserBranches.FirstOrDefaultAsync( x=> x.UserId ==userId, cancellationToken);
+            return await _context.UserBranches.FirstOrDefaultAsync(
+                x => x.UserId == userId && x.IsDefault && x.IsActive,
+                cancellationToken);
         }
     }
 }
