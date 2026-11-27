@@ -258,6 +258,13 @@ internal static class PermissionDefinitions
         new("GalleryItems", "gallery-items.update", PermissionAction.Update, "ویرایش رسانه گالری"),
         new("GalleryItems", "gallery-items.delete", PermissionAction.Delete, "حذف رسانه گالری"),
 
+        // Security - Login histories
+        new("LoginHistories", "login-histories.view", PermissionAction.View, "مشاهده تاریخچه ورود"),
+        new("LoginHistories", "login-histories.manage", PermissionAction.Manage, "مدیریت تاریخچه ورود"),
+
+        // Reports
+        new("Reports", "reports.view", PermissionAction.View, "مشاهده گزارش‌ها"),
+
         // CMS - Generic exports
         new("Reports", "reports.export", PermissionAction.Export, "خروجی گزارش‌ها")
     ];
