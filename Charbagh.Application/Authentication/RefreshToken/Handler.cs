@@ -1,4 +1,4 @@
-﻿using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Application.Abstractions.Security;
 using Charbagh.Application.Common.Exceptions;
 using MediatR;
@@ -11,6 +11,7 @@ public sealed class RefreshTokenHandler
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IUserRepository _userRepository;
     private readonly IUserBranchRepository _userBranchRepository;
+    private readonly IPermissionChecker _permissionChecker;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IRefreshTokenGenerator _refreshTokenGenerator;
     private readonly IUnitOfWork _unitOfWork;
@@ -20,6 +21,7 @@ public sealed class RefreshTokenHandler
         IRefreshTokenRepository refreshTokenRepository,
         IUserRepository userRepository,
         IUserBranchRepository userBranchRepository,
+        IPermissionChecker permissionChecker,
         IJwtTokenGenerator jwtTokenGenerator,
         IRefreshTokenGenerator refreshTokenGenerator,
         IUnitOfWork unitOfWork,
@@ -28,6 +30,7 @@ public sealed class RefreshTokenHandler
         _refreshTokenRepository = refreshTokenRepository;
         _userRepository = userRepository;
         _userBranchRepository = userBranchRepository;
+        _permissionChecker = permissionChecker;
         _jwtTokenGenerator = jwtTokenGenerator;
         _refreshTokenGenerator = refreshTokenGenerator;
         _unitOfWork = unitOfWork;
@@ -61,18 +64,24 @@ public sealed class RefreshTokenHandler
                 currentRefreshToken.UserId,
                 cancellationToken);
 
-        if (user is null)
+        if (user is null || user.Status != UserStatus.Active)
             throw new UnauthorizedAccessException(
-                "User associated with refresh token was not found.");
+                "User associated with refresh token is not active.");
 
-        var userBranch = await _userBranchRepository.GetDefaultByUserIdAsync(user.Id, cancellationToken);
+        var userBranch = await _userBranchRepository.GetDefaultByUserIdAsync(
+            user.Id, cancellationToken);
 
-        if(userBranch is null)
-        {
-            throw new UserBranchNotFoundException(user.Id);
-        }
+        if (userBranch is null)
+            throw new UnauthorizedAccessException(
+                "No active default branch is assigned to this user.");
 
         var branchId = userBranch.BranchId;
+        var hasActiveRole = await _permissionChecker.HasAnyActiveRoleAsync(
+            user.Id, branchId, cancellationToken);
+
+        if (!hasActiveRole)
+            throw new UnauthorizedAccessException(
+                "No active role is assigned to this user in the selected branch.");
 
         var newAccessToken =
             _jwtTokenGenerator.GenerateToken(
