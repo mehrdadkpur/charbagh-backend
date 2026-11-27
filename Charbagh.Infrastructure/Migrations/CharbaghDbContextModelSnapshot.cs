@@ -1290,6 +1290,11 @@ namespace Charbagh.Infrastructure.Migrations
                     b.Property<bool>("IsSuccessful")
                         .HasColumnType("bit");
 
+                    b.Property<string>("AttemptedMobile")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime>("LoginAt")
                         .HasColumnType("datetime2");
 
@@ -1303,7 +1308,7 @@ namespace Charbagh.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -1419,6 +1424,9 @@ namespace Charbagh.Infrastructure.Migrations
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("LoginHistoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("IpAddress")
                         .HasMaxLength(45)
                         .HasColumnType("nvarchar(45)");
@@ -1448,6 +1456,8 @@ namespace Charbagh.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("LoginHistoryId");
 
                     b.HasIndex("Token")
                         .IsUnique();
@@ -2459,14 +2469,18 @@ namespace Charbagh.Infrastructure.Migrations
                     b.HasOne("Charbagh.Domain.Entities.Identity.User", "User")
                         .WithMany("LoginHistories")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Charbagh.Domain.Entities.Identity.RefreshToken", b =>
                 {
+                    b.HasOne("Charbagh.Domain.Entities.Identity.LoginHistory", null)
+                        .WithMany()
+                        .HasForeignKey("LoginHistoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Charbagh.Domain.Entities.Identity.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
