@@ -1,4 +1,4 @@
-﻿using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Application.Abstractions.Persistence.Repositories.Identity;
 using Charbagh.Application.Abstractions.Security;
 using Charbagh.Application.Authentication.Login;
@@ -17,6 +17,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
     private readonly IRefreshTokenGenerator _refreshTokenGenerator;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly ILoginHistoryRepository _loginHistoryRepository;
+    private readonly IPermissionChecker _permissionChecker;
     private readonly IUnitOfWork _unitOfWork;
     private readonly JwtSettings _jwtSettings;
 
@@ -28,6 +29,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
         IRefreshTokenGenerator refreshTokenGenerator,
         IRefreshTokenRepository refreshTokenRepository,
         ILoginHistoryRepository loginHistoryRepository,
+        IPermissionChecker permissionChecker,
         JwtSettings jwtSettings,
         IUnitOfWork unitOfWork)
     {
@@ -38,6 +40,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
         _refreshTokenGenerator = refreshTokenGenerator;
         _refreshTokenRepository = refreshTokenRepository;
         _loginHistoryRepository = loginHistoryRepository;
+        _permissionChecker = permissionChecker;
         _jwtSettings = jwtSettings;
         _unitOfWork = unitOfWork;
     }
@@ -61,15 +64,31 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
             throw new UnauthorizedAccessException(InvalidCredentials);
         }
 
+        if (user.Status != UserStatus.Active)
+        {
+            const string reason = "This user account is not active.";
+            await RecordFailedAttemptAsync(user.Id, request, reason, cancellationToken);
+            throw new UnauthorizedAccessException(InvalidCredentials);
+        }
+
         var userBranch = await _userBranchRepository.GetDefaultByUserIdAsync(user.Id, cancellationToken);
         if (userBranch is null)
         {
-            const string reason = "No default branch is assigned to this user.";
+            const string reason = "No active default branch is assigned to this user.";
             await RecordFailedAttemptAsync(user.Id, request, reason, cancellationToken);
-            throw new InvalidOperationException(reason);
+            throw new UnauthorizedAccessException(InvalidCredentials);
         }
 
         var branchId = userBranch.BranchId;
+        var hasActiveRole = await _permissionChecker.HasAnyActiveRoleAsync(
+            user.Id, branchId, cancellationToken);
+
+        if (!hasActiveRole)
+        {
+            const string reason = "The user has no active role in the default branch.";
+            await RecordFailedAttemptAsync(user.Id, request, reason, cancellationToken);
+            throw new UnauthorizedAccessException(InvalidCredentials);
+        }
         var accessToken = _jwtTokenGenerator.GenerateToken(
             user.Id, branchId, user.Mobile, user.FullName, user.SecurityStamp);
 
