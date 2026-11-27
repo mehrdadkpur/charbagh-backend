@@ -22,6 +22,7 @@ public sealed class StudentParentsController : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission("Parents", PermissionAction.Create)]
     public async Task<IActionResult> Create(CreateStudentParentCommand command, CancellationToken cancellationToken)
     {
         try
@@ -50,6 +51,7 @@ public sealed class StudentParentsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [HasPermission("Parents", PermissionAction.View)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetStudentParentByIdQuery(id), cancellationToken);
