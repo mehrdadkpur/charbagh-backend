@@ -30,6 +30,7 @@ public sealed class LoginHistoryRepository
     {
         return await _context.LoginHistories
             .AsNoTracking()
+            .Include(x => x.User)
             .FirstOrDefaultAsync(
                 x => x.Id == id,
                 cancellationToken);
