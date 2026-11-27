@@ -1,11 +1,12 @@
 ﻿using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Application.Bookitems.Create;
 using Charbagh.Application.Common.Exceptions;
 using Charbagh.Application.Instruments.Common;
 using Charbagh.Application.Instruments.Create;
 using Charbagh.Domain.Entities.Education.EducationCatalog;
 using MediatR;
 
-public sealed class CreateInstrumentHandler : IRequestHandler<CreatebookCommand, InstrumentDto>
+public sealed class CreateInstrumentHandler : IRequestHandler<CreateInstrumentCommand, InstrumentDto>
     {
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IInstrumentCategoryRepository _categoryRepository;
@@ -18,7 +19,7 @@ public sealed class CreateInstrumentHandler : IRequestHandler<CreatebookCommand,
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<InstrumentDto> Handle( CreatebookCommand request, CancellationToken cancellationToken)
+        public async Task<InstrumentDto> Handle( CreateInstrumentCommand request, CancellationToken cancellationToken)
         {
             var category = await _categoryRepository.GetByIdAsync( request.InstrumentCategoryId, cancellationToken);
 
