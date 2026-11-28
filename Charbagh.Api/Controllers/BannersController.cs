@@ -1,9 +1,8 @@
 using Charbagh.Api.Authorization;
+using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Domain.Entities.CMS;
-using Charbagh.Infrastructure.Persistence.Context;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Charbagh.Api.Controllers;
 
@@ -11,27 +10,22 @@ namespace Charbagh.Api.Controllers;
 [Route("api/[controller]")]
 public sealed class BannersController : ControllerBase
 {
-    private readonly CharbaghDbContext _context;
+    private readonly IAnnouncementBannerRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public BannersController(CharbaghDbContext context)
+    public BannersController(
+        IAnnouncementBannerRepository repository,
+        IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet("active")]
     [AllowAnonymous]
     public async Task<IActionResult> GetActive(CancellationToken cancellationToken)
     {
-        var now = DateTime.UtcNow;
-        var banners = await _context.AnnouncementBanners
-            .AsNoTracking()
-            .Where(x => x.Status == BannerStatus.Published
-                && (x.StartsAt == null || x.StartsAt <= now)
-                && (x.EndsAt == null || x.EndsAt > now))
-            .OrderBy(x => x.SortOrder)
-            .ThenByDescending(x => x.CreatedAt)
-            .ToListAsync(cancellationToken);
-
+        var banners = await _repository.GetActiveAsync(DateTime.UtcNow, cancellationToken);
         return Ok(banners.Select(ToDto));
     }
 
@@ -39,12 +33,7 @@ public sealed class BannersController : ControllerBase
     [HasPermission("Banners", PermissionAction.View)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var banners = await _context.AnnouncementBanners
-            .AsNoTracking()
-            .OrderBy(x => x.SortOrder)
-            .ThenByDescending(x => x.CreatedAt)
-            .ToListAsync(cancellationToken);
-
+        var banners = await _repository.GetAllAsync(cancellationToken);
         return Ok(banners.Select(ToDto));
     }
 
@@ -52,10 +41,7 @@ public sealed class BannersController : ControllerBase
     [HasPermission("Banners", PermissionAction.View)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var banner = await _context.AnnouncementBanners
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-
+        var banner = await _repository.GetByIdAsync(id, cancellationToken);
         return banner is null ? NotFound() : Ok(ToDto(banner));
     }
 
@@ -75,8 +61,8 @@ public sealed class BannersController : ControllerBase
             request.EndsAt,
             request.SortOrder);
 
-        await _context.AnnouncementBanners.AddAsync(banner, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _repository.AddAsync(banner, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return CreatedAtAction(nameof(GetById), new { id = banner.Id }, ToDto(banner));
     }
@@ -88,9 +74,7 @@ public sealed class BannersController : ControllerBase
         SaveAnnouncementBannerRequest request,
         CancellationToken cancellationToken)
     {
-        var banner = await _context.AnnouncementBanners
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-
+        var banner = await _repository.GetByIdAsync(id, cancellationToken);
         if (banner is null) return NotFound();
 
         banner.Update(
@@ -103,7 +87,7 @@ public sealed class BannersController : ControllerBase
             request.EndsAt,
             request.SortOrder);
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Ok(ToDto(banner));
     }
 
@@ -132,13 +116,11 @@ public sealed class BannersController : ControllerBase
         Action<AnnouncementBanner> change,
         CancellationToken cancellationToken)
     {
-        var banner = await _context.AnnouncementBanners
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-
+        var banner = await _repository.GetByIdAsync(id, cancellationToken);
         if (banner is null) return NotFound();
 
         change(banner);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Ok(ToDto(banner));
     }
 
