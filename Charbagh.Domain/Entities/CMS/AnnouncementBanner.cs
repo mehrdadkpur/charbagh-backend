@@ -1,5 +1,3 @@
-using Charbagh.Domain.Entities.CMS;
-
 namespace Charbagh.Domain.Entities.CMS;
 
 public sealed class AnnouncementBanner : BaseEntity
@@ -47,7 +45,7 @@ public sealed class AnnouncementBanner : BaseEntity
         DateTime? endsAt,
         int sortOrder)
     {
-        Validate(title, imageUrl, startsAt, endsAt);
+        Validate(title, imageUrl, linkUrl, startsAt, endsAt);
         var banner = new AnnouncementBanner(
             title.Trim(), description?.Trim(), imageUrl.Trim(),
             linkUrl?.Trim(), buttonText?.Trim(), startsAt, endsAt, sortOrder);
@@ -65,7 +63,7 @@ public sealed class AnnouncementBanner : BaseEntity
         DateTime? endsAt,
         int sortOrder)
     {
-        Validate(title, imageUrl, startsAt, endsAt);
+        Validate(title, imageUrl, linkUrl, startsAt, endsAt);
         if (Status == BannerStatus.Archived)
             throw new InvalidOperationException("Archived banners cannot be updated.");
 
@@ -116,14 +114,22 @@ public sealed class AnnouncementBanner : BaseEntity
     }
 
     private static void Validate(
-        string title, string imageUrl, DateTime? startsAt, DateTime? endsAt)
+        string title, string imageUrl, string? linkUrl, DateTime? startsAt, DateTime? endsAt)
     {
         if (string.IsNullOrWhiteSpace(title) || title.Trim().Length > 150)
             throw new ArgumentException("Banner title is required and must not exceed 150 characters.");
-        if (string.IsNullOrWhiteSpace(imageUrl) || imageUrl.Trim().Length > 2048)
-            throw new ArgumentException("A valid banner image URL is required.");
+        if (!IsHttpUrl(imageUrl) || imageUrl.Trim().Length > 2048)
+            throw new ArgumentException("Banner image URL must be a valid HTTP or HTTPS URL.");
+        if (!string.IsNullOrWhiteSpace(linkUrl) && !IsHttpUrl(linkUrl))
+            throw new ArgumentException("Banner link must be a valid HTTP or HTTPS URL.");
         if (startsAt.HasValue && endsAt.HasValue && endsAt <= startsAt)
             throw new ArgumentException("Banner end date must be later than its start date.");
+    }
+
+    private static bool IsHttpUrl(string value)
+    {
+        return Uri.TryCreate(value, UriKind.Absolute, out var uri)
+            && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
     }
 
     private static DateTime? NormalizeUtc(DateTime? value)
