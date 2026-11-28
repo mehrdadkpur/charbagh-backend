@@ -1,4 +1,4 @@
-﻿using Charbagh.Domain.Entities.Branches;
+using Charbagh.Domain.Entities.Branches;
 using Charbagh.Domain.Entities.CMS;
 using Charbagh.Domain.Entities.Education.EducationCatalog;
 using Charbagh.Domain.Entities.Education.StudentEducation;
@@ -40,6 +40,7 @@ public sealed class CharbaghDbContext : DbContext
     public DbSet<EducationService> EducationServices => Set<EducationService>();
     public DbSet<ServicePrice> ServicePrices => Set<ServicePrice>();
     public DbSet<Blog> Blogs => Set<Blog>();
+    public DbSet<AnnouncementBanner> AnnouncementBanners => Set<AnnouncementBanner>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Contact> Contacts => Set<Contact>();
