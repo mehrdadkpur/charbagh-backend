@@ -1,4 +1,4 @@
-﻿using Charbagh.Application.Abstractions.Persistence;
+using Charbagh.Application.Abstractions.Persistence;
 using Charbagh.Application.Abstractions.Persistence.Repositories.Identity;
 using Charbagh.Application.Abstractions.Persistence.Repositories.People;
 using Charbagh.Application.Abstractions.Security;
@@ -56,6 +56,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IInvoiceRepository, InvoiceRepository>();
         services.AddScoped<IInvoiceItemRepository, InvoiceItemRepository>();
         services.AddScoped<IBlogRepository, BlogRepository>();
+        services.AddScoped<IAnnouncementBannerRepository, AnnouncementBannerRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<IContactRepository, ContactRepository>();
