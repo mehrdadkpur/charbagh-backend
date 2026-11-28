@@ -45,7 +45,7 @@ public sealed class AnnouncementBanner : BaseEntity
         DateTime? endsAt,
         int sortOrder)
     {
-        Validate(title, imageUrl, linkUrl, startsAt, endsAt);
+        Validate(title, description, imageUrl, linkUrl, buttonText, startsAt, endsAt, sortOrder);
         var banner = new AnnouncementBanner(
             title.Trim(), description?.Trim(), imageUrl.Trim(),
             linkUrl?.Trim(), buttonText?.Trim(), startsAt, endsAt, sortOrder);
@@ -63,7 +63,7 @@ public sealed class AnnouncementBanner : BaseEntity
         DateTime? endsAt,
         int sortOrder)
     {
-        Validate(title, imageUrl, linkUrl, startsAt, endsAt);
+        Validate(title, description, imageUrl, linkUrl, buttonText, startsAt, endsAt, sortOrder);
         if (Status == BannerStatus.Archived)
             throw new InvalidOperationException("Archived banners cannot be updated.");
 
@@ -114,21 +114,28 @@ public sealed class AnnouncementBanner : BaseEntity
     }
 
     private static void Validate(
-        string title, string imageUrl, string? linkUrl, DateTime? startsAt, DateTime? endsAt)
+        string title, string? description, string imageUrl, string? linkUrl, string? buttonText, DateTime? startsAt, DateTime? endsAt, int sortOrder)
     {
         if (string.IsNullOrWhiteSpace(title) || title.Trim().Length > 150)
             throw new ArgumentException("Banner title is required and must not exceed 150 characters.");
+        if (description?.Length > 500)
+            throw new ArgumentException("Banner description cannot exceed 500 characters.");
         if (!IsHttpUrl(imageUrl) || imageUrl.Trim().Length > 2048)
             throw new ArgumentException("Banner image URL must be a valid HTTP or HTTPS URL.");
-        if (!string.IsNullOrWhiteSpace(linkUrl) && !IsHttpUrl(linkUrl))
-            throw new ArgumentException("Banner link must be a valid HTTP or HTTPS URL.");
+        if (!string.IsNullOrWhiteSpace(linkUrl)
+            && (linkUrl.Trim().Length > 2048 || !IsHttpUrl(linkUrl)))
+            throw new ArgumentException("Banner link must be a valid HTTP or HTTPS URL up to 2048 characters.");
+        if (buttonText?.Length > 60)
+            throw new ArgumentException("Banner button text cannot exceed 60 characters.");
+        if (sortOrder < 0)
+            throw new ArgumentOutOfRangeException(nameof(sortOrder), "Sort order cannot be negative.");
         if (startsAt.HasValue && endsAt.HasValue && endsAt <= startsAt)
             throw new ArgumentException("Banner end date must be later than its start date.");
     }
 
     private static bool IsHttpUrl(string value)
     {
-        return Uri.TryCreate(value, UriKind.Absolute, out var uri)
+        return Uri.TryCreate(value?.Trim(), UriKind.Absolute, out var uri)
             && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
     }
 
