@@ -1,4 +1,4 @@
-﻿namespace Charbagh.Infrastructure.Setup;
+namespace Charbagh.Infrastructure.Setup;
 
 internal sealed record PermissionDefinition(
     string Module,
@@ -221,6 +221,13 @@ internal static class PermissionDefinitions
         new("Blogs", "blogs.update", PermissionAction.Update, "ویرایش مطلب"),
         new("Blogs", "blogs.delete", PermissionAction.Delete, "حذف مطلب"),
         new("Blogs", "blogs.publish", PermissionAction.Approve, "انتشار مطلب"),
+
+        // CMS - Announcement banners
+        new("Banners", "banners.view", PermissionAction.View, "مشاهده بنرهای اطلاع‌رسانی"),
+        new("Banners", "banners.create", PermissionAction.Create, "ایجاد بنر اطلاع‌رسانی"),
+        new("Banners", "banners.update", PermissionAction.Update, "ویرایش بنر اطلاع‌رسانی"),
+        new("Banners", "banners.delete", PermissionAction.Delete, "بایگانی بنر اطلاع‌رسانی"),
+        new("Banners", "banners.publish", PermissionAction.Approve, "انتشار بنر اطلاع‌رسانی"),
 
         // CMS - Comments
         new("Comments", "comments.view", PermissionAction.View, "مشاهده دیدگاه‌ها"),
